@@ -5,14 +5,8 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Converters;
-using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Utilities;
 using FlowrouteNumbersAndMessaging.Standard.Http.Request;
 using FlowrouteNumbersAndMessaging.Standard.Http.Response;
@@ -55,10 +49,11 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="limit">Optional parameter: Limits the number of routes to retrieve. A maximum of 200 items can be retrieved.</param>
         /// <param name="offset">Optional parameter: Offsets the list of routes by your specified value. For example, if you have 4 inbound routes and you entered 1 as your offset value, then only 3 of your routes will be displayed in the response.</param>
         /// <return>Returns the void response from the API call</return>
-        public void ListInboundRoutes(int? limit = null, int? offset = null)
+        public dynamic ListInboundRoutes(int? limit = null, int? offset = null)
         {
-            Task t = ListInboundRoutesAsync(limit, offset);
+            Task<dynamic> t = ListInboundRoutesAsync(limit, offset);
             APIHelper.RunTaskSynchronously(t);
+            return t.Result;
         }
 
         /// <summary>
@@ -67,7 +62,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="limit">Optional parameter: Limits the number of routes to retrieve. A maximum of 200 items can be retrieved.</param>
         /// <param name="offset">Optional parameter: Offsets the list of routes by your specified value. For example, if you have 4 inbound routes and you entered 1 as your offset value, then only 3 of your routes will be displayed in the response.</param>
         /// <return>Returns the void response from the API call</return>
-        public async Task ListInboundRoutesAsync(int? limit = null, int? offset = null)
+        public async Task<dynamic> ListInboundRoutesAsync(int? limit = null, int? offset = null)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -90,7 +85,8 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" }
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
             };
 
             //prepare the API call request to fetch the response
@@ -110,6 +106,14 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
         }
 
         /// <summary>
@@ -137,7 +141,6 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //prepare query string for API call
             StringBuilder _queryBuilder = new StringBuilder(_baseUri);
             _queryBuilder.Append("/v2/routes");
-
 
             //validate and preprocess url
             string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
@@ -183,11 +186,11 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// Use this endpoint to update the primary voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
         /// </summary>
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the primary route for voice will be assigned.</param>
-        /// <param name="body">Required parameter: The primary route to be assigned.</param>
+        /// <param name="routeId">Required parameter: The primary route to be assigned.</param>
         /// <return>Returns the string response from the API call</return>
-        public string UpdatePrimaryVoiceRouteForAPhoneNumber(int numberId, void body)
+        public string UpdatePrimaryVoiceRouteForAPhoneNumber(string numberId, string routeId)
         {
-            Task<string> t = UpdatePrimaryVoiceRouteForAPhoneNumberAsync(numberId, body);
+            Task<string> t = UpdatePrimaryVoiceRouteForAPhoneNumberAsync(numberId, routeId);
             APIHelper.RunTaskSynchronously(t);
             return t.Result;
         }
@@ -196,9 +199,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// Use this endpoint to update the primary voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
         /// </summary>
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the primary route for voice will be assigned.</param>
-        /// <param name="body">Required parameter: The primary route to be assigned.</param>
+        /// <param name="routeId">Required parameter: The primary route to be assigned.</param>
         /// <return>Returns the string response from the API call</return>
-        public async Task<string> UpdatePrimaryVoiceRouteForAPhoneNumberAsync(int numberId, void body)
+        public async Task<string> UpdatePrimaryVoiceRouteForAPhoneNumberAsync(string numberId, string routeId)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -221,11 +224,13 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             var _headers = new Dictionary<string,string>()
             {
                 { "user-agent", "APIMATIC 2.0" },
-                { "content-type", "text/plain; charset=utf-8" }
+                { "accept", "application/json" }
             };
 
             //append body params
-             var _body = body.ToString();
+            var _body = "{\"data\": {\"type\": \"route\", \"id\": \"";
+            _body += routeId;
+            _body += "\"}}";
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PatchBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
@@ -258,11 +263,11 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// Use this endpoint to update the failover voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
         /// </summary>
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the failover route for voice will be assigned.</param>
-        /// <param name="body">Required parameter: The failover route to be assigned.</param>
+        /// <param name="routeID">Required parameter: The failover route to be assigned.</param>
         /// <return>Returns the string response from the API call</return>
-        public string UpdateFailoverVoiceRouteForAPhoneNumber(int numberId, void body)
+        public string UpdateFailoverVoiceRouteForAPhoneNumber(string numberId, string routeId)
         {
-            Task<string> t = UpdateFailoverVoiceRouteForAPhoneNumberAsync(numberId, body);
+            Task<string> t = UpdateFailoverVoiceRouteForAPhoneNumberAsync(numberId, routeId);
             APIHelper.RunTaskSynchronously(t);
             return t.Result;
         }
@@ -273,7 +278,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the failover route for voice will be assigned.</param>
         /// <param name="body">Required parameter: The failover route to be assigned.</param>
         /// <return>Returns the string response from the API call</return>
-        public async Task<string> UpdateFailoverVoiceRouteForAPhoneNumberAsync(int numberId, void body)
+        public async Task<string> UpdateFailoverVoiceRouteForAPhoneNumberAsync(string numberId, string routeId)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -300,7 +305,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             };
 
             //append body params
-             var _body = body.ToString();
+            var _body = "{\"data\": {\"type\": \"route\", \"id\": \"";
+            _body += routeId;
+            _body += "\"}}";
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PatchBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
