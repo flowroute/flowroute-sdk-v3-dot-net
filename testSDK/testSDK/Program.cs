@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Collections;
 using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Controllers;
@@ -19,13 +20,13 @@ namespace testSDK
             ArrayList our_numbers = GetNumbers(client);
 
             // List all our SMS Messages
-            //ArrayList our_messages = GetMessages(client);
+            ArrayList our_messages = GetMessages(client);
 
             // Send an SMS Message from our account
-            //SendSMS(client, (string)our_numbers[0]);
+            SendSMS(client, (string)our_numbers[0]);
 
             // Look up a specific MDR
-            //GetMDRDetail(client, (string)our_messages[0]);
+            GetMDRDetail(client, (string)our_messages[0]);
 
             // Find details for a specific number
             dynamic number_details = GetNumberDetails(client, (string)our_numbers[0]);
@@ -277,7 +278,7 @@ namespace testSDK
         public static ArrayList GetMessages(FlowrouteNumbersAndMessagingClient client)
         {
             ArrayList return_list = new ArrayList();
-            int? limit = 1;
+            int? limit = 100;
             int? offset = 0;
 
             // Find all messages since January 1, 2017
@@ -366,6 +367,7 @@ namespace testSDK
             dynamic result = numbers.GetPhoneNumberDetails(id);
             Console.WriteLine(result);
             return result;
+
         }
     }
 }

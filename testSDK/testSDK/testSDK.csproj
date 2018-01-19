@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>testSDK</RootNamespace>
     <AssemblyName>testSDK</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlowrouteNumbersAndMessaging.Standard">
-      <HintPath>..\..\FlowrouteNumbersAndMessaging.Standard\bin\Debug\netstandard1.3\FlowrouteNumbersAndMessaging.Standard.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +42,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="FlowrouteNumbersAndMessaging.Standard">
+      <HintPath>..\..\FlowrouteNumbersAndMessaging.Standard\bin\Release\netstandard1.3\FlowrouteNumbersAndMessaging.Standard.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
