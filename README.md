@@ -3,13 +3,13 @@ the [Flowroute](https://www.flowroute.com) API.
 
 **Topics**
 
-[Requirements](#requirements)
+- [Requirements](#requirements)
 
-[Installation and Configuration](#installation)
--   [Credentials](#credentials)
+- [Installation and Configuration](#installation)
+    -   [Credentials](#credentials)
 
-[Usage](#usage)
-- [Methods](#methods)
+- [Usage](#usage)
+    - [Methods](#methods)
 
     - [Number Management](#number-management)
         -   [GetAvailableAreaCodes](#getavailableareacodesflowroutenumbersandmessagingclient-client)
@@ -66,17 +66,17 @@ Installation
 
 ### Credentials 
 
-![dot-net-config.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-config.png?raw=true)
+![dot-net-config.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-config.png?raw=true)
 
 4. Select **Build \> Build All** from the menu. You should see a confirmation of a successful build.
 
 5. Next, open **testSDK.sln** from the testSDK subdirectory. Expand **testSDK \> References** in the **Solution Pad**. Check that FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System references are loaded. If not, right-click **References** and select **Edit References**. To add `FlowrouteNumbersandMessaging.Standard.dll`, select **.Net Assembly** and search for it. Select the checkbox and click **OK**.
 
-![flowroute-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
+![flowroute-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-error.png?raw=true)
 
 If the reference is missing, click **Browse** and locate the file.
 
-![missing-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/missing-reference.png/?raw=true)
+![missing-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/missing-reference.png/?raw=true)
 
 
 6. For other missing references, select **Edit References \> All**, and repeat the search and selection process of the previous step.
@@ -939,4 +939,4 @@ In cases of HTTP errors, the .NET library displays a pop-up window with an error
 
 ### Example Error 
 
-![dot-net-error.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
+![dot-net-error.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-error.png?raw=true)
