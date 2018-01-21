@@ -5,14 +5,8 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Converters;
-using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Utilities;
 using FlowrouteNumbersAndMessaging.Standard.Http.Request;
 using FlowrouteNumbersAndMessaging.Standard.Http.Response;
@@ -146,9 +140,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: Phone number to search for which must be a number that you own. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
         /// <return>Returns the Models.Number26 response from the API call</return>
-        public Models.Number26 GetPhoneNumberDetails(int id)
+        public dynamic GetPhoneNumberDetails(string id)
         {
-            Task<Models.Number26> t = GetPhoneNumberDetailsAsync(id);
+            Task<dynamic> t = GetPhoneNumberDetailsAsync(id);
             APIHelper.RunTaskSynchronously(t);
             return t.Result;
         }
@@ -158,7 +152,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: Phone number to search for which must be a number that you own. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
         /// <return>Returns the Models.Number26 response from the API call</return>
-        public async Task<Models.Number26> GetPhoneNumberDetailsAsync(int id)
+        public async Task<dynamic> GetPhoneNumberDetailsAsync(string id)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -203,7 +197,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             try
             {
-                return APIHelper.JsonDeserialize<Models.Number26>(_response.Body);
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
             }
             catch (Exception _ex)
             {
@@ -293,9 +287,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="state">Optional parameter: Filters by and displays phone numbers in the specified state. Optional unless a ratecenter is specified.</param>
         /// <return>Returns the dynamic response from the API call</return>
         public dynamic SearchForPurchasablePhoneNumbers(
-                int? startsWith = null,
-                int? contains = null,
-                int? endsWith = null,
+                string startsWith = null,
+                string contains = null,
+                string endsWith = null,
                 int? limit = null,
                 int? offset = null,
                 string rateCenter = null,
@@ -318,9 +312,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="state">Optional parameter: Filters by and displays phone numbers in the specified state. Optional unless a ratecenter is specified.</param>
         /// <return>Returns the dynamic response from the API call</return>
         public async Task<dynamic> SearchForPurchasablePhoneNumbersAsync(
-                int? startsWith = null,
-                int? contains = null,
-                int? endsWith = null,
+                string startsWith = null,
+                string contains = null,
+                string endsWith = null,
                 int? limit = null,
                 int? offset = null,
                 string rateCenter = null,
@@ -390,10 +384,11 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="offset">Optional parameter: Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response.</param>
         /// <param name="maxSetupCost">Optional parameter: Restricts the results to the specified maximum non-recurring setup cost.</param>
         /// <return>Returns the void response from the API call</return>
-        public void ListAvailableAreaCodes(int? limit = null, int? offset = null, double? maxSetupCost = null)
+        public dynamic ListAvailableAreaCodes(int? limit = null, int? offset = null, double? maxSetupCost = null)
         {
-            Task t = ListAvailableAreaCodesAsync(limit, offset, maxSetupCost);
+            Task<dynamic> t = ListAvailableAreaCodesAsync(limit, offset, maxSetupCost);
             APIHelper.RunTaskSynchronously(t);
+            return t.Result;
         }
 
         /// <summary>
@@ -403,7 +398,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="offset">Optional parameter: Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response.</param>
         /// <param name="maxSetupCost">Optional parameter: Restricts the results to the specified maximum non-recurring setup cost.</param>
         /// <return>Returns the void response from the API call</return>
-        public async Task ListAvailableAreaCodesAsync(int? limit = null, int? offset = null, double? maxSetupCost = null)
+        public async Task<dynamic> ListAvailableAreaCodesAsync(int? limit = null, int? offset = null, double? maxSetupCost = null)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -427,7 +422,8 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" }
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
             };
 
             //prepare the API call request to fetch the response
@@ -447,6 +443,14 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
         }
 
         /// <summary>
@@ -457,14 +461,15 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="maxSetupCost">Optional parameter: Restricts the results to the specified maximum non-recurring setup cost.</param>
         /// <param name="areacode">Optional parameter: Restricts the results to the specified area code.</param>
         /// <return>Returns the void response from the API call</return>
-        public void ListAvailableExchangeCodes(
+        public dynamic ListAvailableExchangeCodes(
                 int? limit = null,
                 int? offset = null,
                 double? maxSetupCost = null,
-                int? areacode = null)
+                string areacode = null)
         {
-            Task t = ListAvailableExchangeCodesAsync(limit, offset, maxSetupCost, areacode);
+            Task<dynamic> t = ListAvailableExchangeCodesAsync(limit, offset, maxSetupCost, areacode);
             APIHelper.RunTaskSynchronously(t);
+            return t.Result;
         }
 
         /// <summary>
@@ -475,11 +480,11 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="maxSetupCost">Optional parameter: Restricts the results to the specified maximum non-recurring setup cost.</param>
         /// <param name="areacode">Optional parameter: Restricts the results to the specified area code.</param>
         /// <return>Returns the void response from the API call</return>
-        public async Task ListAvailableExchangeCodesAsync(
+        public async Task<dynamic> ListAvailableExchangeCodesAsync(
                 int? limit = null,
                 int? offset = null,
                 double? maxSetupCost = null,
-                int? areacode = null)
+                string areacode = null)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -504,7 +509,8 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" }
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
             };
 
             //prepare the API call request to fetch the response
@@ -524,7 +530,14 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
         }
-
     }
 } 
