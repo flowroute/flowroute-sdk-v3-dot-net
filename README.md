@@ -4,8 +4,10 @@ the [Flowroute](https://www.flowroute.com) API.
 **Topics**
 
 [Requirements](#requirements)
+
 [Installation and Configuration](#installation)
 -   [Credentials](#credentials)
+
 [Usage](#usage)
 - [Methods](#methods)
 
@@ -64,18 +66,17 @@ Installation
 
 ### Credentials 
 
-[![](/flowroute-sdk-v3-dot-net/images/dot-net-config.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-config.png?raw=true)
-
+![dot-net-config.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-config.png?raw=true)
 
 4. Select **Build \> Build All** from the menu. You should see a confirmation of a successful build.
 
 5. Next, open **testSDK.sln** from the testSDK subdirectory. Expand **testSDK \> References** in the **Solution Pad**. Check that FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System references are loaded. If not, right-click **References** and select **Edit References**. To add `FlowrouteNumbersandMessaging.Standard.dll`, select **.Net Assembly** and search for it. Select the checkbox and click **OK**.
 
-[![](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
+![flowroute-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
 
 If the reference is missing, click **Browse** and locate the file.
 
-[![](/flowroute-sdk-v3-dot-net/images/missing-reference.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/missing-reference.png/?raw=true)
+![missing-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/missing-reference.png/?raw=true)
 
 
 6. For other missing references, select **Edit References \> All**, and repeat the search and selection process of the previous step.
@@ -154,7 +155,6 @@ The method declares `limit`, `offset`, and `maxSetupCost` as parameters which yo
         return return_list;
     }
 
-\
 
 ##### Example Response 
 
@@ -190,7 +190,6 @@ On success, the HTTP status code in the response header is `200 OK` and the resp
       }
     }
 
-\
 
 #### GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client) 
 The method declares `limit`, `offset`, `maxSetupCost`, and `areacode` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-exchanges/).
@@ -322,10 +321,8 @@ The method declares `startsWith`, `contains`, `endsWith`, `rateCenter`, `state`,
         return return_list;
     }
 
-\
- \
 
-##### Example Response {#exampleresponse-2}
+##### Example Response 
 
 On success, the HTTP status code in the response header is 200 OK and
 the response body contains an array of phone number objects in JSON
@@ -779,8 +776,7 @@ On success, the HTTP status code in the response header is `202 Accepted` and th
       }
     }
 
-\
- \
+
 
 #### GetMessages(FlowrouteNumbersAndMessagingClient client) 
 
@@ -827,7 +823,6 @@ The method declares `startDate`, `endDate`, `limit`, and `offset` as parameters 
         return return_list;
     }
 
-\
 
 ##### Example Response 
 
@@ -944,4 +939,4 @@ In cases of HTTP errors, the .NET library displays a pop-up window with an error
 
 ### Example Error 
 
-[![](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
+![dot-net-error.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
