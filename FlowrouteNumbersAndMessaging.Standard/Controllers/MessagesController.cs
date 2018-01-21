@@ -5,14 +5,8 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Converters;
-using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Utilities;
 using FlowrouteNumbersAndMessaging.Standard.Http.Request;
 using FlowrouteNumbersAndMessaging.Standard.Http.Response;
@@ -57,13 +51,13 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="limit">Optional parameter: The number of MDRs to retrieve at one time. You can set as high of a number as you want, but the number cannot be negative and must be greater than 0 (zero).</param>
         /// <param name="offset">Optional parameter: The number of MDRs to skip when performing a query. The number must be 0 (zero) or greater, but cannot be negative.</param>
         /// <return>Returns the string response from the API call</return>
-        public string GetLookUpASetOfMessages(
+        public dynamic GetLookUpASetOfMessages(
                 DateTime startDate,
                 DateTime? endDate = null,
                 int? limit = null,
                 int? offset = null)
         {
-            Task<string> t = GetLookUpASetOfMessagesAsync(startDate, endDate, limit, offset);
+            Task<dynamic> t = GetLookUpASetOfMessagesAsync(startDate, endDate, limit, offset);
             APIHelper.RunTaskSynchronously(t);
             return t.Result;
         }
@@ -76,7 +70,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// <param name="limit">Optional parameter: The number of MDRs to retrieve at one time. You can set as high of a number as you want, but the number cannot be negative and must be greater than 0 (zero).</param>
         /// <param name="offset">Optional parameter: The number of MDRs to skip when performing a query. The number must be 0 (zero) or greater, but cannot be negative.</param>
         /// <return>Returns the string response from the API call</return>
-        public async Task<string> GetLookUpASetOfMessagesAsync(
+        public async Task<dynamic> GetLookUpASetOfMessagesAsync(
                 DateTime startDate,
                 DateTime? endDate = null,
                 int? limit = null,
@@ -96,24 +90,25 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
                 { "end_date", (endDate.HasValue) ? endDate.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK") : null },
                 { "limit", limit },
                 { "offset", offset }
-            },ArrayDeserializationFormat,ParameterSeparator);
+            }, ArrayDeserializationFormat, ParameterSeparator);
 
 
             //validate and preprocess url
             string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
 
             //append request with appropriate headers and parameters
-            var _headers = new Dictionary<string,string>()
+            var _headers = new Dictionary<string, string>()
             {
-                { "user-agent", "APIMATIC 2.0" }
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
             };
 
             //prepare the API call request to fetch the response
-            HttpRequest _request = ClientInstance.Get(_queryUrl,_headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+            HttpRequest _request = ClientInstance.Get(_queryUrl, _headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
 
             //invoke request and get response
-            HttpStringResponse _response = (HttpStringResponse) await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
-            HttpContext _context = new HttpContext(_request,_response);
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)
@@ -127,14 +122,13 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             try
             {
-                return _response.Body;
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
             }
             catch (Exception _ex)
             {
                 throw new APIException("Failed to parse the response: " + _ex.Message, _context);
             }
         }
-
         /// <summary>
         /// Sends an SMS or MMS from a Flowroute long code or toll-free phone number to another valid phone number.
         /// </summary>
@@ -169,7 +163,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             var _headers = new Dictionary<string,string>()
             {
                 { "user-agent", "APIMATIC 2.0" },
-                { "content-type", "application/json; charset=utf-8" }
+                { "content-type", "application/vnd.api+json" }
             };
 
             //append body params
@@ -213,9 +207,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: The unique message detail record identifier (MDR ID) of any message. When entering the MDR ID, the number should include the mdr2- preface.</param>
         /// <return>Returns the Models.MDR2 response from the API call</return>
-        public Models.MDR2 GetLookUpAMessageDetailRecord(string id)
+        public dynamic GetLookUpAMessageDetailRecord(string id)
         {
-            Task<Models.MDR2> t = GetLookUpAMessageDetailRecordAsync(id);
+            Task<dynamic> t = GetLookUpAMessageDetailRecordAsync(id);
             APIHelper.RunTaskSynchronously(t);
             return t.Result;
         }
@@ -225,7 +219,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: The unique message detail record identifier (MDR ID) of any message. When entering the MDR ID, the number should include the mdr2- preface.</param>
         /// <return>Returns the Models.MDR2 response from the API call</return>
-        public async Task<Models.MDR2> GetLookUpAMessageDetailRecordAsync(string id)
+        public async Task<dynamic> GetLookUpAMessageDetailRecordAsync(string id)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -248,7 +242,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             var _headers = new Dictionary<string,string>()
             {
                 { "user-agent", "APIMATIC 2.0" },
-                { "accept", "application/json" }
+                { "content-type", "application/vnd.api+json" }
             };
 
             //prepare the API call request to fetch the response
@@ -270,7 +264,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             try
             {
-                return APIHelper.JsonDeserialize<Models.MDR2>(_response.Body);
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
             }
             catch (Exception _ex)
             {

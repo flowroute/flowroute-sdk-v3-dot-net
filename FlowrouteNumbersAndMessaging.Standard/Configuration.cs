@@ -1,19 +1,16 @@
-using FlowrouteNumbersAndMessaging.Standard.Models;
 namespace FlowrouteNumbersAndMessaging.Standard
 {
     public partial class Configuration
     {
-
         //The base Uri for API calls
         public static string BaseUri = "https://api.flowroute.com";
 
         //The username to use with basic authentication
-        //TODO: Replace the BasicAuthUserName with an appropriate value
-        public static string BasicAuthUserName = "TODO: Replace";
+        //TODO: Replace the BasicAuthUserName with your Flowroute Access Key
+        public static string BasicAuthUserName = "YOUR_FR_ACCESS_KEY";
 
         //The password to use with basic authentication
-        //TODO: Replace the BasicAuthPassword with an appropriate value
-        public static string BasicAuthPassword = "TODO: Replace";
-
+        //TODO: Replace the BasicAuthPassword with your Flowroute Secret Key
+        public static string BasicAuthPassword = "YOUR_FR_SECRET_KEY";
     }
 }
