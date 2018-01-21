@@ -7,10 +7,10 @@ namespace FlowrouteNumbersAndMessaging.Standard
 
         //The username to use with basic authentication
         //TODO: Replace the BasicAuthUserName with your Flowroute Access Key
-        public static string BasicAuthUserName = "FR_ACCESS_KEY";
+        public static string BasicAuthUserName = "YOUR_FR_ACCESS_KEY";
 
         //The password to use with basic authentication
         //TODO: Replace the BasicAuthPassword with your Flowroute Secret Key
-        public static string BasicAuthPassword = "FR_SECRET_KEY";
+        public static string BasicAuthPassword = "YOUR_FR_SECRET_KEY";
     }
 }
