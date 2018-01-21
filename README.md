@@ -1,39 +1,25 @@
-[** View Repo](https://github.com/flowroute/flowroute-sdk-v3-dot-net)
-
-The Flowroute .NET Library v3 provides methods for interacting with
-[Numbers v2](https://developer.flowroute.com/api/numbers/v2.0/) and
-[Messages v2.1](https://developer.flowroute.com/api/messages/v2.1/) of
+The Flowroute .NET Library v3 provides methods for interacting with [Numbers v2](https://developer.flowroute.com/api/numbers/v2.0/) and [Messages v2.1](https://developer.flowroute.com/api/messages/v2.1/) of
 the [Flowroute](https://www.flowroute.com) API.
 
 **Topics**
 
 [Requirements](#requirements)
-
 [Installation and Configuration](#installation)
-
 -   [Credentials](#credentials)
-
 [Usage](#usage)
-
 [Methods](#methods)
-
 [Number Management](#numbermanagement)
-
 -   [GetAvailableAreaCodes](#list_available_area_codes)
 -   [GetAvailableExchangeCodes](#list_available_exchange_codes)
 -   [GetAvailableNumbers](#search_for_purchasable_phone_numbers)
 -   [GetNumbers](#list_account_phone_numbers)
 -   [GetNumberDetails](#list_phone_number_details)
-
 [Route Management](#routemanagement)
-
 -   [CreateInboundRoute](#create_an_inbound_route)
 -   [GetInboundRoutes](#list_inbound_routes)
 -   [UpdatePrimaryRoute](#update_primary_voice_routenumber_id)
 -   [UpdateFailoverRoute](#update_failover_voice_routenumber_id)
-
 [Messaging](#messaging)
-
 -   [SendSMS](#send_a_message)
 -   [GetMessages](#look_up_a_set_of_messages)
 -   [GetMDRDetail](#look_up_a_message_detail_record)
@@ -42,8 +28,7 @@ the [Flowroute](https://www.flowroute.com) API.
 [Errors](#errors)
 
 * * * * *
-
-Requirements {#requirements .anchor}
+Requirements 
 ------------
 
 -   Flowroute [API
@@ -58,11 +43,10 @@ Requirements {#requirements .anchor}
     or higher
 
 * * * * *
-
-Installation {#installation .anchor}
+Installation 
 ------------
 
-First, start a shell session and clone the SDK:
+1. First, start a shell session and clone the SDK:
 
 #### via HTTPS:
 
@@ -74,99 +58,63 @@ First, start a shell session and clone the SDK:
     git@github.com:flowroute/flowroute-sdk-v3-dot-net.git
                         
 
-Make a note of the location of your newly-created
-flowroute-sdk-v3-dot-net directory. This version of the SDK was compiled
-and tested using Visual Studio 2017 for Mac and features two different
-solutions, **FlowrouteNumbersAndMessaging**, and its accompanying test,
-**testSDK**. To build your solutions, launch Visual Studio 2017 on your
-machine.
+2. Make a note of the location of your newly-created `flowroute-sdk-v3-dot-net` directory. This version of the SDK was compiled and tested using Visual Studio 2017 for Mac and features two different solutions, **FlowrouteNumbersAndMessaging**, and its accompanying test, **testSDK**. To build your solutions, launch Visual Studio 2017 on your machine.
 
-Open **FlowrouteNumbersAndMessaging.sln** from the root directory of the
-SDK. Once your solution is loaded, modify **Configuration.cs** by
-updating BasicAuthUserName with your Flowroute API Access Key and
-BasicAuthPassword with your Flowroute API Secret Key.
+3. Open **FlowrouteNumbersAndMessaging.sln** from the root directory of the SDK. Once your solution is loaded, modify **Configuration.cs** by updating `BasicAuthUserName` with your Flowroute API Access Key and `BasicAuthPassword` with your Flowroute API Secret Key.
 
-### Credentials {#credentials .anchor}
+### Credentials 
 
 [![](/flowroute-sdk-v3-dot-net/images/dot-net-config.png)](/flowroute-sdk-v3-dot-net/images/dot-net-config.png)
-\
-\
 
-Select **Build \> Build All** from the menu. You should see a
-confirmation of a successful build.
 
-Next, open **testSDK.sln** from the testSDK subdirectory. Expand
-**testSDK \> References** in the **Solution Pad**. Check that
-FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System
-references are loaded. If not, right-click **References** and select
-**Edit References**. To add FlowrouteNumbersandMessaging.Standard.dll,
-select **.Net Assembly** and search for it. Select the checkbox and
-click **OK**.
+4. Select **Build \> Build All** from the menu. You should see a confirmation of a successful build.
+
+5. Next, open **testSDK.sln** from the testSDK subdirectory. Expand **testSDK \> References** in the **Solution Pad**. Check that FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System references are loaded. If not, right-click **References** and select **Edit References**. To add `FlowrouteNumbersandMessaging.Standard.dll`, select **.Net Assembly** and search for it. Select the checkbox and click **OK**.
 
 [![](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)
-\
- \
- If the reference is missing, click **Browse** and locate the file.
+
+If the reference is missing, click **Browse** and locate the file.
 
 [![](/flowroute-sdk-v3-dot-net/images/missing-reference.png)](/flowroute-sdk-v3-dot-net/images/missing-reference.png)
-\
-\
 
-For other missing references, select **Edit References \> All**, and
-repeat the search and selection process of the previous step.
 
-Expand **Packages** in the **Solution Pad** and check that
-Newtonsoft.Json 10.0.3 has been added. If not, right-click **Packages**
-and select **Add Packages**. Search and select the missing package.
 
-Repeat step 4 to build the test solution.
+6. For other missing references, select **Edit References \> All**, and repeat the search and selection process of the previous step.
+
+7. Expand **Packages** in the **Solution Pad** and check that `Newtonsoft.Json 10.0.3` has been added. If not, right-click **Packages** and select **Add Packages**. Search and select the missing package.
+
+8. Repeat step 4 to build the test solution.
 
 * * * * *
-
-Usage {#usage .anchor}
+Usage
 -----
 
-In Flowroute's approach to building the .NET library v3, HTTP requests
-are handled by an API client object accessed by methods defined in
-**Program.cs**. To run the tests, select **Program.cs** from the
-Solution Pad then select **Run \> Start Debugging** from the menu. The
-methods in the file are used to perform messaging, number management,
-and route management within the .NET Library.
+In Flowroute's approach to building the .NET library v3, HTTP requests are handled by an API client object accessed by methods defined in **Program.cs**. To run the tests, select **Program.cs** from the Solution Pad then select **Run \> Start Debugging** from the menu. The methods in the file are used to perform messaging, number management, and route management within the .NET Library.
 
-### Instantiate API Client {#clientobject .anchor}
+### Instantiate API Client
 
-After importing all the required references and packages and declaring
-the class, we instantiate the API client object.
+After importing all the required references and packages and declaring the class, we instantiate the API client object.
 
-    // Instantiate API client and authenticate
+// Instantiate API client and authenticate
     FlowrouteNumbersAndMessagingClient client = new FlowrouteNumbersAndMessagingClient(FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthUserName, FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthPassword);
 
-\
 
-Methods {#methods .anchor}
+Methods 
 -------
 
-The following section will demonstrate the capabilities of Numbers v2
-and Messages v2.1 that are wrapped in our .NET library. Note that the
-example responses may not show the expected results from the method
-calls in **Program.cs**. These examples have been formatted using Mac's
-pbpaste and jq. To learn more, see [Quickly Tidy Up JSON from the
-Command
-Line](http://onebigfunction.com/vim/2015/02/02/quickly-tidying-up-json-from-the-command-line-and-vim/).
+The following section will demonstrate the capabilities of Numbers v2 and Messages v2.1 that are wrapped in our .NET library. Note that the example responses may not show the expected results from the method
+calls in **Program.cs**. These examples have been formatted using Mac's `pbpaste` and `jq`. To learn more, see [Quickly Tidy Up JSON from the Command Line](http://onebigfunction.com/vim/2015/02/02/quickly-tidying-up-json-from-the-command-line-and-vim/).
 
-### Number Management {#numbermanagement .anchor}
+### Number Management
 
-Flowroute .NET Library v3 allows you to make HTTP requests to the
-numbers resource of Flowroute API v2:
-https://api.flowroute.com/v2/numbers
+Flowroute .NET Library v3 allows you to make HTTP requests to the `numbers` resource of Flowroute API v2:
+`https://api.flowroute.com/v2/numbers`
 
-#### GetAvailableAreaCodes(FlowrouteNumbersAndMessagingClient client) {#list_available_area_codes .anchor}
+#### GetAvailableAreaCodes(FlowrouteNumbersAndMessagingClient client) 
 
-The method declares limit, offset, and maxSetupCost as parameters which
-you can learn more about in the [API
-reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-area-codes/).
+The method declares `limit`, `offset`, and `maxSetupCost` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-area-codes/).
 
-##### Method Declaration {#examplerequest}
+##### Method Declaration
 
     private static ArrayList GetAvailableAreaCodes(FlowrouteNumbersAndMessagingClient client)
     {
@@ -209,10 +157,9 @@ reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-area-
 
 \
 
-##### Example Response {#exampleresponse}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 200 OK and
-the response body contains an array of area code objects in JSON format.
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of area code objects in JSON format.
 
     {
       "data": [
@@ -246,13 +193,10 @@ the response body contains an array of area code objects in JSON format.
 
 \
 
-#### GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client) {#list_available_exchange_codes .anchor}
+#### GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client) 
+The method declares `limit`, `offset`, `maxSetupCost`, and `areacode` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-exchanges/).
 
-The method declares limit, offset, max\_setup\_cost, and areacode as
-parameters which you can learn more about in the [API
-reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-exchanges/).
-
-##### Method Declaration {#examplerequest-1}
+##### Method Declaration 
 
     private static ArrayList GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client)
     {
@@ -295,13 +239,10 @@ reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-excha
         return return_list;
     }
 
-\
- \
 
-##### Example Response {#exampleresponse-1}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 200 OK and
-the response body contains an array of exchange objects in JSON format.
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of exchange objects in JSON format.
 
     {
       "data": [
@@ -333,16 +274,12 @@ the response body contains an array of exchange objects in JSON format.
       }
     }
 
-\
 
-#### GetAvailableNumbers(FlowrouteNumbersAndMessagingClient client) {#search_for_purchasable_phone_numbers .anchor}
+#### GetAvailableNumbers(FlowrouteNumbersAndMessagingClient client) 
 
-The method declares startsWith, contains, endsWith, rateCenter, state,
-limit, and offset as parameters which you can learn more about in the
-[API
-reference](https://developer.flowroute.com/api/numbers/v2.0/search-for-purchasable-phone-numbers/).
+The method declares `startsWith`, `contains`, `endsWith`, `rateCenter`, `state`, `limit`, and `offset` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/search-for-purchasable-phone-numbers/).
 
-##### Method Declaration {#examplerequest-2}
+##### Method Declaration 
 
     private static ArrayList GetAvailableNumbers(FlowrouteNumbersAndMessagingClient client)
     {
@@ -452,7 +389,7 @@ format.
 \
  \
 
-#### GetNumbers(FlowrouteNumbersAndMessagingClient client) {#list_account_phone_numbers .anchor}
+#### GetNumbers(FlowrouteNumbersAndMessagingClient client) 
 
 The method declares startsWith, contains, endsWith, rateCenter, state,
 limit, and offset as parameters which you can learn more about in the
@@ -556,7 +493,7 @@ format.
 \
  \
 
-#### GetNumberDetails(FlowrouteNumbersAndMessagingClient client, string id) {#list_phone_number_details .anchor}
+#### GetNumberDetails(FlowrouteNumbersAndMessagingClient client, string id) 
 
 The method declares the id as a variable which you can learn more about
 in the [API
@@ -641,20 +578,16 @@ the response body contains a phone number object in JSON format.
 \
  \
 
-### Route Management {#routemanagement .anchor}
+### Route Management 
 
 The Flowroute .NET Library v3 allows you to make HTTP requests to the
 routes resource of Flowroute API v2: https://api.flowroute.com/v2/routes
 
-#### CreateInboundRoute(FlowrouteNumbersAndMessagingClient client) {#create_an_inbound_route .anchor}
+#### CreateInboundRoute(FlowrouteNumbersAndMessagingClient client) 
 
-The method declares the route object in JSON format as a parameter which
-you can learn more about in the [API
-reference](https://developer.flowroute.com/api/numbers/v2.0/create-an-inbound-route/).
-In the following example, we declare a test route with route\_type
-"host".
+The method declares the route object in JSON format as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/create-an-inbound-route/). In the following example, we declare a test route with `route_type` "host".
 
-##### Method Declaration {#examplerequest-6}
+##### Method Declaration
 
     private static void CreateInboundRoute(FlowrouteNumbersAndMessagingClient client)
     {
@@ -673,10 +606,9 @@ In the following example, we declare a test route with route\_type
 \
  \
 
-##### Example Response {#exampleresponse-6}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 201 Created
-and the response body contains a route object in JSON format.
+On success, the HTTP status code in the response header is `201 Created` and the response body contains a route object in JSON format.
 
     {
       "data": {
@@ -699,13 +631,12 @@ and the response body contains a route object in JSON format.
 \
  \
 
-#### GetInboundRoutes(FlowrouteNumbersAndMessagingClient client) {#list_inbound_routes .anchor}
+#### GetInboundRoutes(FlowrouteNumbersAndMessagingClient client) 
 
-The method declares limit and offset as parameters which you can learn
-more about in the [API
+The method declares limit and offset as parameters which you can learn more about in the [API
 reference](https://developer.flowroute.com/api/numbers/v2.0/list-inbound-routes/).
 
-##### Method Declaration {#examplerequest-7}
+##### Method Declaration 
 
     private static ArrayList GetInboundRoutes(FlowrouteNumbersAndMessagingClient client)
     {
@@ -748,10 +679,9 @@ reference](https://developer.flowroute.com/api/numbers/v2.0/list-inbound-routes/
 
 \
 
-##### Example Response {#exampleresponse-7}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 200 OK and
-the response body contains an array of route objects in JSON format.
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of route objects in JSON format.
 
     {
       "data": [
@@ -788,13 +718,11 @@ the response body contains an array of route objects in JSON format.
 
 \
 
-#### UpdatePrimaryRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) {#update_primary_voice_routenumber_id .anchor}
+#### UpdatePrimaryRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) 
 
-The method updates a DID with the route\_id parameter which you can
-learn more about in the [API
-reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-primary-voice-route/).
+The method updates a DID with the route\_id parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-primary-voice-route/).
 
-##### Method Declaration {#examplerequest-8}
+##### Method Declaration 
 
      private static void UpdatePrimaryRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route_id)
     {
@@ -803,26 +731,21 @@ reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-primar
         Console.WriteLine(result);
     }
 
-\
- \
 
-##### Example Response {#exampleresponse-8}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 204 No
-Content which means that the server successfully processed the request
-and is not returning any content.
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
 
     204: No Content
 
 \
 
-#### UpdateFailoverRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) {#update_failover_voice_routenumber_id .anchor}
+#### UpdateFailoverRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) 
 
-The method updates a DID with the route\_id parameter which you can
-learn more about in the [API
+The method updates a DID with the `route_id` parameter which you can learn more about in the [API
 reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-failover-voice-route/).
 
-##### Method Declaration {#examplerequest-9}
+##### Method Declaration 
 
     private static void UpdateFailoverRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route_id)
     {
@@ -833,32 +756,20 @@ reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-failov
 
 \
 
-##### Example Response {#exampleresponse-9}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 204 No
-Content which means that the server successfully processed the request
-and is not returning any content.
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
 
     204: No Content
 
-\
- \
 
-### Messaging {#messaging .anchor}
+### Messaging 
 
-The Flowroute .NET Library v3 allows you to make HTTP requests to the
-messages resource of Flowroute API v2.1:
-https://api.flowroute.com/v2.1/messages
+The Flowroute .NET Library v3 allows you to make HTTP requests to the `messages` resource of Flowroute API v2.1: `https://api.flowroute.com/v2.1/messages`
 
-#### SendSMS(FlowrouteNumbersAndMessagingClient client, string from\_did) {#send_a_message .anchor}
+#### SendSMS(FlowrouteNumbersAndMessagingClient client, string from\_did) 
 
-The method declares a message object in JSON format as a parameter which
-you can learn more about in the API References for
-[MMS](https://developer.flowroute.com/api/messages/v2.1/send-an-mms/)
-and
-[SMS](https://developer.flowroute.com/api/messages/v2.1/send-an-sms/).
-In the following example, we are sending an MMS with a gif attachment
-from the previously declared number\_id to your mobile number.
+The method declares a message object in JSON format as a parameter which you can learn more about in the API References for [MMS](https://developer.flowroute.com/api/messages/v2.1/send-an-mms/) and [SMS](https://developer.flowroute.com/api/messages/v2.1/send-an-sms/). In the following example, we are sending an SMS from the previously declared `from_did` to your mobile number.
 
 ##### Method Declaration {#examplerequest-10}
 
@@ -876,13 +787,11 @@ from the previously declared number\_id to your mobile number.
 
 \
 
-Note that this function call is currently commented out. Uncomment to
-test the SendSMS method.
+Note that this function call is currently commented out. Uncomment to test the `SendSMS` method.
 
-##### Example Response {#exampleresponse-10}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 202 Accepted
-and the response body contains the message record ID with mdr2 prefix.
+On success, the HTTP status code in the response header is `202 Accepted` and the response body contains the message record ID with mdr2 prefix.
 
     {
       "data": {
@@ -897,13 +806,11 @@ and the response body contains the message record ID with mdr2 prefix.
 \
  \
 
-#### GetMessages(FlowrouteNumbersAndMessagingClient client) {#look_up_a_set_of_messages .anchor}
+#### GetMessages(FlowrouteNumbersAndMessagingClient client) 
 
-The method declares startDate, endDate, limit, and offset as parameters
-which you can learn more about in the [API
-Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-set-of-messages/).
+The method declares `startDate`, `endDate`, `limit`, and `offset` as parameters which you can learn more about in the [API Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-set-of-messages/).
 
-##### Method Declaration {#examplerequest-11}
+##### Method Declaration 
 
     public static ArrayList GetMessages(FlowrouteNumbersAndMessagingClient client)
     {
@@ -946,10 +853,9 @@ Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-set-of-mess
 
 \
 
-##### Example Response {#exampleresponse-11}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 200 OK and
-the response body contains an array of message objects in JSON format.
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of message objects in JSON format.
 
     {
       "data": [
@@ -1013,15 +919,12 @@ the response body contains an array of message objects in JSON format.
 \
  \
 
-#### GetMDRDetail(FlowrouteNumbersAndMessagingClient client, string id) {#look_up_a_message_detail_record .anchor}
+#### GetMDRDetail(FlowrouteNumbersAndMessagingClient client, string id) 
 
-The method declares a message id in MDR2 format as a variable which you
-can learn more about in the [API
-Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-a-message-detail-record/).
-In the following example, we retrieve the details of the first message
-in our look\_up\_a\_set\_of\_messages search result.
+The method declares a message `id` in MDR2 format as a variable which you can learn more about in the [API
+Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-a-message-detail-record/). In the following example, we retrieve the details of the first message in our look\_up\_a\_set\_of\_messages search result.
 
-##### Method Declaration {#examplerequest-12}
+##### Method Declaration 
 
       private static void GetMDRDetail(FlowrouteNumbersAndMessagingClient client, string id)
     {
@@ -1035,11 +938,9 @@ in our look\_up\_a\_set\_of\_messages search result.
 
 \
 
-##### Example Response {#exampleresponse-12}
+##### Example Response 
 
-On success, the HTTP status code in the response header is 200 OK and
-the response body contains the message object for our specified message
-id.
+On success, the HTTP status code in the response header is `200 OK` and the response body contains the message object for our specified message `id`.
 
     {
       "data": {
@@ -1064,13 +965,11 @@ id.
 
 \
 
-Errors {#errors .anchor}
+Errors 
 ------
 
-In cases of HTTP errors, the .NET library displays a pop-up window with
-an error message next to the line of code that caused the error. You can
-add more error logging if necessary.
+In cases of HTTP errors, the .NET library displays a pop-up window with an error message next to the line of code that caused the error. You can add more error logging if necessary.
 
-### Example Error {#exampleerror}
+### Example Error 
 
 [![](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)
