@@ -4,12 +4,9 @@ the [Flowroute](https://www.flowroute.com) API.
 **Topics**
 
 [Requirements](#requirements)
-
 [Installation and Configuration](#installation)
 -   [Credentials](#credentials)
-
 [Usage](#usage)
-
 - [Methods](#methods)
 
     - [Number Management](#number-management)
@@ -17,17 +14,16 @@ the [Flowroute](https://www.flowroute.com) API.
         -   [GetAvailableExchangeCodes](#getavailableexchangecodesflowroutenumbersandmessagingclient-client)
         -   [GetAvailableNumbers](#getavailablenumbersflowroutenumbersandmessagingclient-client)
         -   [GetNumbers](#getnumbersflowroutenumbersandmessagingclient-client)
-        -   [GetNumberDetails](#)
+        -   [GetNumberDetails](#getnumberdetailsflowroutenumbersandmessagingclient-client-string-id)
     - [Route Management](#routemanagement)
-        -   [CreateInboundRoute](#create_an_inbound_route)
-        -   [GetInboundRoutes](#list_inbound_routes)
-        -   [UpdatePrimaryRoute](#update_primary_voice_routenumber_id)
-        -   [UpdateFailoverRoute](#update_failover_voice_routenumber_id)
+        -   [CreateInboundRoute](#createinboundrouteflowroutenumbersandmessagingclient-client)
+        -   [GetInboundRoutes](#getinboundroutesflowroutenumbersandmessagingclient-client)
+        -   [UpdatePrimaryRoute](#updateprimaryrouteflowroutenumbersandmessagingclient-client-string-did-string-route_id)
+        -   [UpdateFailoverRoute](#updatefailoverrouteflowroutenumbersandmessagingclient-client-string-did-string-route_id)
     - [Messaging](#messaging)
-        -   [SendSMS](#send_a_message)
-        -   [GetMessages](#look_up_a_set_of_messages)
-        -   [GetMDRDetail](#look_up_a_message_detail_record)
-        -   [UpdateFailoverRoute](#update_failover_voice_routenumber_id)
+        -   [SendSMS](#sendsmsflowroutenumbersandmessagingclient-client-string-from_did)
+        -   [GetMessages](#getmessagesflowroutenumbersandmessagingclient-client)
+        -   [GetMDRDetail](#getmdrdetailflowroutenumbersandmessagingclient-client-string-id)
 
 - [Errors](#errors)
 
@@ -68,18 +64,18 @@ Installation
 
 ### Credentials 
 
-[![](/flowroute-sdk-v3-dot-net/images/dot-net-config.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-config.png)
+[![](/flowroute-sdk-v3-dot-net/images/dot-net-config.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-config.png?raw=true)
 
 
 4. Select **Build \> Build All** from the menu. You should see a confirmation of a successful build.
 
 5. Next, open **testSDK.sln** from the testSDK subdirectory. Expand **testSDK \> References** in the **Solution Pad**. Check that FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System references are loaded. If not, right-click **References** and select **Edit References**. To add `FlowrouteNumbersandMessaging.Standard.dll`, select **.Net Assembly** and search for it. Select the checkbox and click **OK**.
 
-[![](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png)
+[![](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)](/flowroute-sdk-v3-dot-net/images/flowroute-reference.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
 
 If the reference is missing, click **Browse** and locate the file.
 
-[![](/flowroute-sdk-v3-dot-net/images/missing-reference.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/missing-reference.png/)
+[![](/flowroute-sdk-v3-dot-net/images/missing-reference.png)](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/missing-reference.png/?raw=true)
 
 
 6. For other missing references, select **Edit References \> All**, and repeat the search and selection process of the previous step.
@@ -97,10 +93,10 @@ In Flowroute's approach to building the .NET library v3, HTTP requests are handl
 ### Instantiate API Client
 
 After importing all the required references and packages and declaring the class, we instantiate the API client object.
-
+```cs
 // Instantiate API client and authenticate
     FlowrouteNumbersAndMessagingClient client = new FlowrouteNumbersAndMessagingClient(FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthUserName, FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthPassword);
-
+```
 
 Methods 
 -------
@@ -948,4 +944,4 @@ In cases of HTTP errors, the .NET library displays a pop-up window with an error
 
 ### Example Error 
 
-[![](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png)
+[![](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)](/flowroute-sdk-v3-dot-net/images/dot-net-error.png)(https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/clacina1/images/dot-net-error.png?raw=true)
