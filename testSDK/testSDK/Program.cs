@@ -23,7 +23,7 @@ namespace testSDK
             ArrayList our_messages = GetMessages(client);
 
             // Send an SMS Message from our account
-            SendSMS(client, (string)our_numbers[0]);
+            //SendSMS(client, (string)our_numbers[0]);
 
             // Look up a specific MDR
             GetMDRDetail(client, (string)our_messages[0]);
@@ -267,7 +267,7 @@ namespace testSDK
         {
             Message msg = new Message();
             msg.From = from_did;
-            msg.To = "4254664078";
+            msg.To = "YOUR_MOBILE_NUMBER"; // Replace with your mobile number to receive messages sent from your Flowroute account
             msg.Body = "Hi Chris";
 
             MessagesController messages = client.Messages;
@@ -364,6 +364,7 @@ namespace testSDK
             // User the Numbers Controller from our Client
             NumbersController numbers = client.Numbers;
 
+            Console.WriteLine("---------------------------\nList Phone Number Details:\n");
             dynamic result = numbers.GetPhoneNumberDetails(id);
             Console.WriteLine(result);
             return result;
