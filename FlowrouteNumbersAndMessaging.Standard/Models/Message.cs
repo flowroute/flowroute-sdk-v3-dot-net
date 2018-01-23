@@ -15,8 +15,8 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         private string mfrom;
         private string to;
         private string body;
-        private List<string> mediaUrls;
-        private bool? isMms;
+        //private List<string> mediaUrls;
+        //private bool? isMms;
 
         /// <summary>
         /// TODO: Write general description for this method
@@ -68,7 +68,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
                 onPropertyChanged("Body");
             }
         }
-
+        /*
         /// <summary>
         /// TODO: Write general description for this method
         /// </summary>
@@ -102,5 +102,85 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
                 onPropertyChanged("IsMms");
             }
         }
+        */
     }
+
+    public class MMS_Message : BaseModel
+    {
+        // These fields hold the values for the public properties.
+        private string mfrom;
+        private string to;
+        private string body;
+        private List<string> mediaUrls;
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("from")]
+        public string From
+        {
+            get
+            {
+                return this.mfrom;
+            }
+            set
+            {
+                this.mfrom = value;
+                onPropertyChanged("From");
+            }
+        }
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("to")]
+        public string To
+        {
+            get
+            {
+                return this.to;
+            }
+            set
+            {
+                this.to = value;
+                onPropertyChanged("To");
+            }
+        }
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("body")]
+        public string Body
+        {
+            get
+            {
+                return this.body;
+            }
+            set
+            {
+                this.body = value;
+                onPropertyChanged("Body");
+            }
+        }
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("media_urls")]
+        public List<string> MediaUrls 
+        { 
+            get 
+            {
+                return this.mediaUrls; 
+            } 
+            set 
+            {
+                this.mediaUrls = value;
+                onPropertyChanged("MediaUrls");
+            }
+        }
+
+    }
+
 } 

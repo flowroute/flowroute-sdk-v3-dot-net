@@ -130,7 +130,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             }
         }
         /// <summary>
-        /// Sends an SMS or MMS from a Flowroute long code or toll-free phone number to another valid phone number.
+        /// Sends an SMS from a Flowroute long code or toll-free phone number to another valid phone number.
         /// </summary>
         /// <param name="body">Required parameter: The SMS or MMS message to send.</param>
         /// <return>Returns the string response from the API call</return>
@@ -142,7 +142,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
-        /// Sends an SMS or MMS from a Flowroute long code or toll-free phone number to another valid phone number.
+        /// Sends an SMS from a Flowroute long code or toll-free phone number to another valid phone number.
         /// </summary>
         /// <param name="body">Required parameter: The SMS or MMS message to send.</param>
         /// <return>Returns the string response from the API call</return>
@@ -168,6 +168,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             //append body params
             var _body = APIHelper.JsonSerialize(body);
+            Console.WriteLine("Body is : {0} ",_body);
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
@@ -175,6 +176,80 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //invoke request and get response
             HttpStringResponse _response = (HttpStringResponse) await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
             HttpContext _context = new HttpContext(_request,_response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Forbidden – You don't have permission to access this resource.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            if (_response.StatusCode == 422)
+                throw new ErrorException(@"Unprocessable Entity - You tried to enter an incorrect value.", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.Body;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
+        /// Sends an SMS from a Flowroute long code or toll-free phone number to another valid phone number.
+        /// </summary>
+        /// <param name="body">Required parameter: The SMS or MMS message to send.</param>
+        /// <return>Returns the string response from the API call</return>
+        public string CreateSendAMMSMessage(Models.MMS_Message body)
+        {
+            Task<string> t = CreateSendAMMSMessageAsync(body);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Sends an SMS from a Flowroute long code or toll-free phone number to another valid phone number.
+        /// </summary>
+        /// <param name="body">Required parameter: The SMS or MMS message to send.</param>
+        /// <return>Returns the string response from the API call</return>
+        public async Task<string> CreateSendAMMSMessageAsync(Models.MMS_Message body)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2.1/messages");
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "content-type", "application/vnd.api+json" }
+            };
+
+            //append body params
+            var _body = APIHelper.JsonSerialize(body);
+            Console.WriteLine("Body is : {0} ", _body);
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)
