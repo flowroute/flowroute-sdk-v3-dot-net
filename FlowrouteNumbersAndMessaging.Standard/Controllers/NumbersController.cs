@@ -104,7 +104,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
@@ -174,7 +174,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
@@ -244,7 +244,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
@@ -346,7 +346,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
@@ -422,7 +422,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
@@ -509,7 +509,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //append request with appropriate headers and parameters
             var _headers = new Dictionary<string,string>()
             {
-                { "user-agent", "APIMATIC 2.0" },
+                { "user-agent", "Flowroute SDK v3.0" },
                 { "accept", "application/json" }
             };
 
