@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Collections;
+using System.Collections.Generic;
 using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Controllers;
 using FlowrouteNumbersAndMessaging.Standard.Models;
@@ -23,7 +24,10 @@ namespace testSDK
             ArrayList our_messages = GetMessages(client);
 
             // Send an SMS Message from our account
-            //SendSMS(client, (string)our_numbers[0]);
+            SendSMS(client, (string)our_numbers[0]);
+
+            // Send an SMS Message from our account
+            SendMMS(client, (string)our_numbers[0]);
 
             // Look up a specific MDR
             GetMDRDetail(client, (string)our_messages[0]);
@@ -275,10 +279,26 @@ namespace testSDK
             Console.WriteLine(result);
         }
 
+        private static void SendMMS(FlowrouteNumbersAndMessagingClient client, string from_did)
+        {
+            MMS_Message msg = new MMS_Message();
+            msg.From = from_did;
+            msg.To = "4254664078";
+            msg.Body = "Hi Chris";
+            // Create the image / media urls to add to the message
+            List<string> pictures = new List<string>();
+            pictures.Add("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png");
+            msg.MediaUrls = pictures;
+
+            MessagesController messages = client.Messages;
+            string result = messages.CreateSendAMMSMessage(msg);
+            Console.WriteLine(result);
+        }
+
         public static ArrayList GetMessages(FlowrouteNumbersAndMessagingClient client)
         {
             ArrayList return_list = new ArrayList();
-            int? limit = 100;
+            int? limit = 20;
             int? offset = 0;
 
             // Find all messages since January 1, 2017
