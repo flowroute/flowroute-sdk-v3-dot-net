@@ -1,626 +1,942 @@
-# Getting started
+The Flowroute .NET Library v3 provides methods for interacting with [Numbers v2](https://developer.flowroute.com/api/numbers/v2.0/) and [Messages v2.1](https://developer.flowroute.com/api/messages/v2.1/) of
+the [Flowroute](https://www.flowroute.com) API.
 
-The Flowroute APIs are organized around REST. Our APIs have resource-oriented URLs, support HTTP Verbs, and respond with HTTP Status Codes. All API requests and responses, including errors, will be represented as JSON objects. You can use the Flowroute APIs to manage your Flowroute phone numbers including setting primary and failover routes for inbound calls, and sending text messages (SMS and MMS) using long-code or toll-free numbers in your account.
+**Topics**
 
-## How to Build
+- [Requirements](#requirements)
 
-The generated code uses the Newtonsoft Json.NET NuGet Package. If the automatic NuGet package restore
-is enabled, these dependencies will be installed automatically. Therefore,
-you will need internet access for build.
+- [Installation and Configuration](#installation)
+    -   [Credentials](#credentials)
 
-"This library requires Visual Studio 2017 for compilation."
-1. Open the solution (FlowrouteNumbersAndMessaging.sln) file.
-2. Invoke the build process using `Ctrl+Shift+B` shortcut key or using the `Build` menu as shown below.
+- [Usage](#usage)
+    - [Methods](#methods)
 
-![Building SDK using Visual Studio](https://apidocs.io/illustration/cs?step=buildSDK&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+        - [Number Management](#number-management)
+            -   [GetAvailableAreaCodes](#getavailableareacodesflowroutenumbersandmessagingclient-client)
+            -   [GetAvailableExchangeCodes](#getavailableexchangecodesflowroutenumbersandmessagingclient-client)
+            -   [GetAvailableNumbers](#getavailablenumbersflowroutenumbersandmessagingclient-client)
+            -   [GetNumbers](#getnumbersflowroutenumbersandmessagingclient-client)
+        -   [GetNumberDetails](#getnumberdetailsflowroutenumbersandmessagingclient-client-string-id)
+        - [Route Management](#routemanagement)
+            -   [CreateInboundRoute](#createinboundrouteflowroutenumbersandmessagingclient-client)
+            -   [GetInboundRoutes](#getinboundroutesflowroutenumbersandmessagingclient-client)
+            -   [UpdatePrimaryRoute](#updateprimaryrouteflowroutenumbersandmessagingclient-client-string-did-string-route_id)
+            -   [UpdateFailoverRoute](#updatefailoverrouteflowroutenumbersandmessagingclient-client-string-did-string-route_id)
+        - [Messaging](#messaging)
+            -   [SendSMS](#sendsmsflowroutenumbersandmessagingclient-client-string-from_did)
+            -   [GetMessages](#getmessagesflowroutenumbersandmessagingclient-client)
+            -   [GetMDRDetail](#getmdrdetailflowroutenumbersandmessagingclient-client-string-id)
 
-## How to Use
+    - [Errors](#errors)
 
-The build process generates a portable class library, which can be used like a normal class library. The generated library is compatible with Windows Forms, Windows RT, Windows Phone 8,
-Silverlight 5, Xamarin iOS, Xamarin Android and Mono. More information on how to use can be found at the [MSDN Portable Class Libraries documentation](http://msdn.microsoft.com/en-us/library/vstudio/gg597391%28v=vs.100%29.aspx).
+* * * * *
+Requirements 
+------------
 
-The following section explains how to use the FlowrouteNumbersAndMessaging library in a new console project.
+-   Flowroute [API
+    credentials](https://manage.flowroute.com/accounts/preferences/api/)
+-   [Visual Studio](https://www.visualstudio.com/) 2017 for compilation
+-   [NETStandard.Library](https://www.nuget.org/packages/NETStandard.Library/)
+    1.3 or higher
+-   Any of the supported [.NET
+    platforms](https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-implementation-support)
+    which implements .NET Standard 1.3
+-   [Json.NET](https://www.nuget.org/packages/Newtonsoft.Json/) 10.0.3
+    or higher
 
-### 1. Starting a new project
+* * * * *
+Installation 
+------------
 
-For starting a new project, right click on the current solution from the *solution explorer* and choose  ``` Add -> New Project ```.
+1. First, start a shell session and clone the SDK:
 
-![Add a new project in the existing solution using Visual Studio](https://apidocs.io/illustration/cs?step=addProject&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+#### via HTTPS:
 
-Next, choose "Console Application", provide a ``` TestConsoleProject ``` as the project name and click ``` OK ```.
+    git clone https://github.com/flowroute/flowroute-sdk-v3-dot-net.git
+                        
 
-![Create a new console project using Visual Studio](https://apidocs.io/illustration/cs?step=createProject&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+#### via SSH:
 
-### 2. Set as startup project
+    git@github.com:flowroute/flowroute-sdk-v3-dot-net.git
+                        
 
-The new console project is the entry point for the eventual execution. This requires us to set the ``` TestConsoleProject ``` as the start-up project. To do this, right-click on the  ``` TestConsoleProject ``` and choose  ``` Set as StartUp Project ``` form the context menu.
+2. Make a note of the location of your newly-created `flowroute-sdk-v3-dot-net` directory. This version of the SDK was compiled and tested using Visual Studio 2017 for Mac and features two different solutions, **FlowrouteNumbersAndMessaging**, and its accompanying test, **testSDK**. To build your solutions, launch Visual Studio 2017 on your machine.
 
-![Set the new cosole project as the start up project](https://apidocs.io/illustration/cs?step=setStartup&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+3. Open **FlowrouteNumbersAndMessaging.sln** from the root directory of the SDK. Once your solution is loaded, modify **Configuration.cs** by updating `BasicAuthUserName` with your Flowroute API Access Key and `BasicAuthPassword` with your Flowroute API Secret Key.
 
-### 3. Add reference of the library project
+### Credentials 
 
-In order to use the FlowrouteNumbersAndMessaging library in the new project, first we must add a projet reference to the ``` TestConsoleProject ```. First, right click on the ``` References ``` node in the *solution explorer* and click ``` Add Reference... ```.
+![dot-net-config.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-config.png?raw=true)
 
-![Open references of the TestConsoleProject](https://apidocs.io/illustration/cs?step=addReference&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+4. Select **Build \> Build All** from the menu. You should see a confirmation of a successful build.
 
-Next, a window will be displayed where we must set the ``` checkbox ``` on ``` FlowrouteNumbersAndMessaging.Standard ``` and click ``` OK ```. By doing this, we have added a reference of the ```FlowrouteNumbersAndMessaging.Standard``` project into the new ``` TestConsoleProject ```.
+5. Next, open **testSDK.sln** from the testSDK subdirectory. Expand **testSDK \> References** in the **Solution Pad**. Check that FlowrouteNumbersandMessaging, Newtonsoft.Json, and all the System references are loaded. If not, right-click **References** and select **Edit References**. To add `FlowrouteNumbersandMessaging.Standard.dll`, select **.Net Assembly** and search for it. Select the checkbox and click **OK**.
 
-![Add a reference to the TestConsoleProject](https://apidocs.io/illustration/cs?step=createReference&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
+![flowroute-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-error.png?raw=true)
 
-### 4. Write sample code
+If the reference is missing, click **Browse** and locate the file.
 
-Once the ``` TestConsoleProject ``` is created, a file named ``` Program.cs ``` will be visible in the *solution explorer* with an empty ``` Main ``` method. This is the entry point for the execution of the entire solution.
-Here, you can add code to initialize the client library and acquire the instance of a *Controller* class. Sample code to initialize the client library and using controller methods is given in the subsequent sections.
-
-![Add a reference to the TestConsoleProject](https://apidocs.io/illustration/cs?step=addCode&workspaceFolder=Flowroute%20Numbers%20and%20Messaging-CSharp&workspaceName=FlowrouteNumbersAndMessaging&projectName=FlowrouteNumbersAndMessaging.Standard)
-
-## How to Test
-
-The generated SDK also contain one or more Tests, which are contained in the Tests project.
-In order to invoke these test cases, you will need *NUnit 3.0 Test Adapter Extension for Visual Studio*.
-Once the SDK is complied, the test cases should appear in the Test Explorer window.
-Here, you can click *Run All* to execute these test cases.
-
-## Initialization
-
-### Authentication
-In order to setup authentication and initialization of the API client, you need the following information.
-
-| Parameter | Description |
-|-----------|-------------|
-| basicAuthUserName | The username to use with basic authentication |
-| basicAuthPassword | The password to use with basic authentication |
+![missing-reference.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/missing-reference.png/?raw=true)
 
 
+6. For other missing references, select **Edit References \> All**, and repeat the search and selection process of the previous step.
 
-API client can be initialized as following.
+7. Expand **Packages** in the **Solution Pad** and check that `Newtonsoft.Json 10.0.3` has been added. If not, right-click **Packages** and select **Add Packages**. Search and select the missing package.
 
-```csharp
-// Configuration parameters and credentials
-string basicAuthUserName = "basicAuthUserName"; // The username to use with basic authentication
-string basicAuthPassword = "basicAuthPassword"; // The password to use with basic authentication
+8. Repeat step 4 to build the test solution.
 
-FlowrouteNumbersAndMessagingClient client = new FlowrouteNumbersAndMessagingClient(basicAuthUserName, basicAuthPassword);
+* * * * *
+Usage
+-----
+
+In Flowroute's approach to building the .NET library v3, HTTP requests are handled by an API client object accessed by methods defined in **Program.cs**. To run the tests, select **Program.cs** from the Solution Pad then select **Run \> Start Debugging** from the menu. The methods in the file are used to perform messaging, number management, and route management within the .NET Library.
+
+### Instantiate API Client
+
+After importing all the required references and packages and declaring the class, we instantiate the API client object.
+```cs
+// Instantiate API client and authenticate
+    FlowrouteNumbersAndMessagingClient client = new FlowrouteNumbersAndMessagingClient(FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthUserName, FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthPassword);
 ```
 
-
-
-# Class Reference
-
-## <a name="list_of_controllers"></a>List of Controllers
-
-* [MessagesController](#messages_controller)
-* [NumbersController](#numbers_controller)
-* [RoutesController](#routes_controller)
-
-## <a name="messages_controller"></a>![Class: ](https://apidocs.io/img/class.png "FlowrouteNumbersAndMessaging.Standard.Controllers.MessagesController") MessagesController
-
-### Get singleton instance
-
-The singleton instance of the ``` MessagesController ``` class can be accessed from the API Client.
-
-```csharp
-MessagesController messages = client.Messages;
-```
-
-### <a name="get_look_up_a_set_of_messages"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.MessagesController.GetLookUpASetOfMessages") GetLookUpASetOfMessages
-
-> Retrieves a list of Message Detail Records (MDRs) within a specified date range. Date and time is based on Coordinated Universal Time (UTC).
-
-
-```csharp
-Task<string> GetLookUpASetOfMessages(
-        DateTime startDate,
-        DateTime? endDate = null,
-        int? limit = null,
-        int? offset = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| startDate |  ``` Required ```  | The beginning date and time, in UTC, on which to perform an MDR search. The DateTime can be formatted as YYYY-MM-DDor YYYY-MM-DDTHH:mm:ss.SSZ. |
-| endDate |  ``` Optional ```  | The ending date and time, in UTC, on which to perform an MDR search. The DateTime can be formatted as YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.SSZ. |
-| limit |  ``` Optional ```  | The number of MDRs to retrieve at one time. You can set as high of a number as you want, but the number cannot be negative and must be greater than 0 (zero). |
-| offset |  ``` Optional ```  | The number of MDRs to skip when performing a query. The number must be 0 (zero) or greater, but cannot be negative. |
-
-
-#### Example Usage
-
-```csharp
-DateTime startDate = DateTime.Now();
-DateTime? endDate = DateTime.Now();
-int? limit = 174;
-int? offset = 174;
-
-string result = await messages.GetLookUpASetOfMessages(startDate, endDate, limit, offset);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="create_send_a_message"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.MessagesController.CreateSendAMessage") CreateSendAMessage
-
-> Sends an SMS or MMS from a Flowroute long code or toll-free phone number to another valid phone number.
-
-
-```csharp
-Task<string> CreateSendAMessage(Models.Message body)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| body |  ``` Required ```  | The SMS or MMS message to send. |
-
-
-#### Example Usage
-
-```csharp
-var body = new Models.Message();
-
-string result = await messages.CreateSendAMessage(body);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 403 | Forbidden – You don't have permission to access this resource. |
-| 404 | The specified resource was not found |
-| 422 | Unprocessable Entity - You tried to enter an incorrect value. |
-
-
-### <a name="get_look_up_a_message_detail_record"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.MessagesController.GetLookUpAMessageDetailRecord") GetLookUpAMessageDetailRecord
-
-> Searches for a specific message record ID and returns a Message Detail Record (in MDR2 format).
-
-
-```csharp
-Task<Models.MDR2> GetLookUpAMessageDetailRecord(string id)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| id |  ``` Required ```  | The unique message detail record identifier (MDR ID) of any message. When entering the MDR ID, the number should include the mdr2- preface. |
-
-
-#### Example Usage
-
-```csharp
-string id = "id";
-
-Models.MDR2 result = await messages.GetLookUpAMessageDetailRecord(id);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-[Back to List of Controllers](#list_of_controllers)
-
-## <a name="numbers_controller"></a>![Class: ](https://apidocs.io/img/class.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController") NumbersController
-
-### Get singleton instance
-
-The singleton instance of the ``` NumbersController ``` class can be accessed from the API Client.
-
-```csharp
-NumbersController numbers = client.Numbers;
-```
-
-### <a name="get_account_phone_numbers"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.GetAccountPhoneNumbers") GetAccountPhoneNumbers
-
-> Returns a list of all phone numbers currently on your Flowroute account. The response includes details such as the phone number's rate center, state, number type, and whether CNAM Lookup is enabled for that number.
-
-
-```csharp
-Task<dynamic> GetAccountPhoneNumbers(
-        int? startsWith = null,
-        int? endsWith = null,
-        int? contains = null,
-        int? limit = null,
-        int? offset = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| startsWith |  ``` Optional ```  | Retrieves phone numbers that start with the specified value. |
-| endsWith |  ``` Optional ```  | Retrieves phone numbers that end with the specified value. |
-| contains |  ``` Optional ```  | Retrieves phone numbers containing the specified value. |
-| limit |  ``` Optional ```  | Limits the number of items to retrieve. A maximum of 200 items can be retrieved. |
-| offset |  ``` Optional ```  | Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response. |
-
-
-#### Example Usage
-
-```csharp
-int? startsWith = 174;
-int? endsWith = 174;
-int? contains = 174;
-int? limit = 174;
-int? offset = 174;
-
-dynamic result = await numbers.GetAccountPhoneNumbers(startsWith, endsWith, contains, limit, offset);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="get_phone_number_details"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.GetPhoneNumberDetails") GetPhoneNumberDetails
-
-> Lists all of the information associated with any of the phone numbers in your account, including billing method, primary voice route, and failover voice route.
-
-
-```csharp
-Task<Models.Number26> GetPhoneNumberDetails(int id)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| id |  ``` Required ```  | Phone number to search for which must be a number that you own. Must be in 11-digit E.164 format; e.g. 12061231234. |
-
-
-#### Example Usage
-
-```csharp
-int id = 174;
-
-Models.Number26 result = await numbers.GetPhoneNumberDetails(id);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized |
-| 404 | Not Found |
-
-
-### <a name="create_purchase_a_phone_number"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.CreatePurchaseAPhoneNumber") CreatePurchaseAPhoneNumber
-
-> Lets you purchase a phone number from available Flowroute inventory.
-
-
-```csharp
-Task<Models.Number26> CreatePurchaseAPhoneNumber(int id)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| id |  ``` Required ```  | Phone number to purchase. Must be in 11-digit E.164 format; e.g. 12061231234. |
-
-
-#### Example Usage
-
-```csharp
-int id = 174;
-
-Models.Number26 result = await numbers.CreatePurchaseAPhoneNumber(id);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="search_for_purchasable_phone_numbers"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.SearchForPurchasablePhoneNumbers") SearchForPurchasablePhoneNumbers
-
-> This endpoint lets you search for phone numbers by state or rate center, or by your specified search value.
-
-
-```csharp
-Task<dynamic> SearchForPurchasablePhoneNumbers(
-        int? startsWith = null,
-        int? contains = null,
-        int? endsWith = null,
-        int? limit = null,
-        int? offset = null,
-        string rateCenter = null,
-        string state = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| startsWith |  ``` Optional ```  | Retrieve phone numbers that start with the specified value. |
-| contains |  ``` Optional ```  | Retrieve phone numbers containing the specified value. |
-| endsWith |  ``` Optional ```  | Retrieve phone numbers that end with the specified value. |
-| limit |  ``` Optional ```  | Limits the number of items to retrieve. A maximum of 200 items can be retrieved. |
-| offset |  ``` Optional ```  | Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response. |
-| rateCenter |  ``` Optional ```  | Filters by and displays phone numbers in the specified rate center. |
-| state |  ``` Optional ```  | Filters by and displays phone numbers in the specified state. Optional unless a ratecenter is specified. |
-
-
-#### Example Usage
-
-```csharp
-int? startsWith = 174;
-int? contains = 174;
-int? endsWith = 174;
-int? limit = 174;
-int? offset = 174;
-string rateCenter = "rate_center";
-string state = "state";
-
-dynamic result = await numbers.SearchForPurchasablePhoneNumbers(startsWith, contains, endsWith, limit, offset, rateCenter, state);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="list_available_area_codes"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.ListAvailableAreaCodes") ListAvailableAreaCodes
-
-> Returns a list of all Numbering Plan Area (NPA) codes containing purchasable phone numbers.
-
-
-```csharp
-Task ListAvailableAreaCodes(int? limit = null, int? offset = null, double? maxSetupCost = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| limit |  ``` Optional ```  | Limits the number of items to retrieve. A maximum of 400 items can be retrieved. |
-| offset |  ``` Optional ```  | Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response. |
-| maxSetupCost |  ``` Optional ```  | Restricts the results to the specified maximum non-recurring setup cost. |
-
-
-#### Example Usage
-
-```csharp
-int? limit = 174;
-int? offset = 174;
-double? maxSetupCost = 174.403489464616;
-
-await numbers.ListAvailableAreaCodes(limit, offset, maxSetupCost);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="list_available_exchange_codes"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.NumbersController.ListAvailableExchangeCodes") ListAvailableExchangeCodes
-
-> Returns a list of all Central Office (exchange) codes containing purchasable phone numbers.
-
-
-```csharp
-Task ListAvailableExchangeCodes(
-        int? limit = null,
-        int? offset = null,
-        double? maxSetupCost = null,
-        int? areacode = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| limit |  ``` Optional ```  | Limits the number of items to retrieve. A maximum of 200 items can be retrieved. |
-| offset |  ``` Optional ```  | Offsets the list of phone numbers by your specified value. For example, if you have 4 phone numbers and you entered 1 as your offset value, then only 3 of your phone numbers will be displayed in the response. |
-| maxSetupCost |  ``` Optional ```  | Restricts the results to the specified maximum non-recurring setup cost. |
-| areacode |  ``` Optional ```  | Restricts the results to the specified area code. |
-
-
-#### Example Usage
-
-```csharp
-int? limit = 174;
-int? offset = 174;
-double? maxSetupCost = 174.403489464616;
-int? areacode = 174;
-
-await numbers.ListAvailableExchangeCodes(limit, offset, maxSetupCost, areacode);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-[Back to List of Controllers](#list_of_controllers)
-
-## <a name="routes_controller"></a>![Class: ](https://apidocs.io/img/class.png "FlowrouteNumbersAndMessaging.Standard.Controllers.RoutesController") RoutesController
-
-### Get singleton instance
-
-The singleton instance of the ``` RoutesController ``` class can be accessed from the API Client.
-
-```csharp
-RoutesController routes = client.Routes;
-```
-
-### <a name="list_inbound_routes"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.RoutesController.ListInboundRoutes") ListInboundRoutes
-
-> Returns a list of your inbound routes. From the list, you can then select routes to use as the primary and failover routes for a phone number, which you can do via "Update Primary Voice Route for a Phone Number" and "Update Failover Voice Route for a Phone Number".
-
-
-```csharp
-Task ListInboundRoutes(int? limit = null, int? offset = null)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| limit |  ``` Optional ```  | Limits the number of routes to retrieve. A maximum of 200 items can be retrieved. |
-| offset |  ``` Optional ```  | Offsets the list of routes by your specified value. For example, if you have 4 inbound routes and you entered 1 as your offset value, then only 3 of your routes will be displayed in the response. |
-
-
-#### Example Usage
-
-```csharp
-int? limit = 174;
-int? offset = 174;
-
-await routes.ListInboundRoutes(limit, offset);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized |
-| 404 | Not Found |
-
-
-### <a name="create_an_inbound_route"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.RoutesController.CreateAnInboundRoute") CreateAnInboundRoute
-
-> Creates a new inbound route which can then be associated with phone numbers. Please see "List Inbound Routes" to review the route values that you can associate with your Flowroute phone numbers.
-
-
-```csharp
-Task<string> CreateAnInboundRoute(Models.NewRoute body)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| body |  ``` Required ```  | The new inbound route to be created. |
-
-
-#### Example Usage
-
-```csharp
-var body = new Models.NewRoute();
-
-string result = await routes.CreateAnInboundRoute(body);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="update_primary_voice_route_for_a_phone_number"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.RoutesController.UpdatePrimaryVoiceRouteForAPhoneNumber") UpdatePrimaryVoiceRouteForAPhoneNumber
-
-> Use this endpoint to update the primary voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
-
-
-```csharp
-Task<string> UpdatePrimaryVoiceRouteForAPhoneNumber(int numberId, void body)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| numberId |  ``` Required ```  | The phone number in E.164 11-digit North American format to which the primary route for voice will be assigned. |
-| body |  ``` Required ```  | The primary route to be assigned. |
-
-
-#### Example Usage
-
-```csharp
-int numberId = 174;
-void body = ;
-
-string result = await routes.UpdatePrimaryVoiceRouteForAPhoneNumber(numberId, body);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-### <a name="update_failover_voice_route_for_a_phone_number"></a>![Method: ](https://apidocs.io/img/method.png "FlowrouteNumbersAndMessaging.Standard.Controllers.RoutesController.UpdateFailoverVoiceRouteForAPhoneNumber") UpdateFailoverVoiceRouteForAPhoneNumber
-
-> Use this endpoint to update the failover voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
-
-
-```csharp
-Task<string> UpdateFailoverVoiceRouteForAPhoneNumber(int numberId, void body)
-```
-
-#### Parameters
-
-| Parameter | Tags | Description |
-|-----------|------|-------------|
-| numberId |  ``` Required ```  | The phone number in E.164 11-digit North American format to which the failover route for voice will be assigned. |
-| body |  ``` Required ```  | The failover route to be assigned. |
-
-
-#### Example Usage
-
-```csharp
-int numberId = 174;
-void body = ;
-
-string result = await routes.UpdateFailoverVoiceRouteForAPhoneNumber(numberId, body);
-
-```
-
-#### Errors
-
-| Error Code | Error Description |
-|------------|-------------------|
-| 401 | Unauthorized – There was an issue with your API credentials. |
-| 404 | The specified resource was not found |
-
-
-[Back to List of Controllers](#list_of_controllers)
-
-
-
+Methods 
+-------
+
+The following section will demonstrate the capabilities of Numbers v2 and Messages v2.1 that are wrapped in our .NET library. Note that the example responses may not show the expected results from the method
+calls in **Program.cs**. These examples have been formatted using Mac's `pbpaste` and `jq`. To learn more, see [Quickly Tidy Up JSON from the Command Line](http://onebigfunction.com/vim/2015/02/02/quickly-tidying-up-json-from-the-command-line-and-vim/).
+
+### Number Management
+
+Flowroute .NET Library v3 allows you to make HTTP requests to the `numbers` resource of Flowroute API v2:
+`https://api.flowroute.com/v2/numbers`
+
+#### GetAvailableAreaCodes(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares `limit`, `offset`, and `maxSetupCost` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-area-codes/).
+
+##### Method Declaration
+
+    private static ArrayList GetAvailableAreaCodes(FlowrouteNumbersAndMessagingClient client)
+    {
+        ArrayList return_list = new ArrayList();
+
+        int? limit = 3;
+        int? offset = 0;
+        double? maxSetupCost = 3.25;
+
+        // User the Numbers Controller from our Client
+        NumbersController numbers = client.Numbers;
+
+        do
+        {
+            Console.WriteLine("Offset is {0}", offset);
+            dynamic areacode_data = numbers.ListAvailableAreaCodes(limit, offset, maxSetupCost);
+            Console.WriteLine(areacode_data);
+
+            foreach (var item in areacode_data.data)
+            {
+                Console.WriteLine("---------------------------\nAvailable Area Code:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((string)item.id);
+            }
+
+            // See if there is more data to process
+            var links = areacode_data.links;
+            if (links.next != null)
+            {
+                // more data to pull
+                offset += limit;
+            }
+            else
+            {
+                break;   // no more data
+            }
+        } while (true);
+        return return_list;
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of area code objects in JSON format.
+
+    {
+      "data": [
+        {
+          "type": "areacode",
+          "id": "201",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available/exchanges?areacode=201"
+          }
+        },
+        {
+          "type": "areacode",
+          "id": "202",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available/exchanges?areacode=202"
+          }
+        },
+        {
+          "type": "areacode",
+          "id": "203",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available/exchanges?areacode=203"
+          }
+        }
+      ],
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers/available/areacodes?max_setup_cost=3&limit=3&offset=0",
+        "next": "https://api.flowroute.com/v2/numbers/available/areacodes?max_setup_cost=3&limit=3&offset=3"
+      }
+    }
+
+
+#### GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client) 
+The method declares `limit`, `offset`, `maxSetupCost`, and `areacode` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-available-exchanges/).
+
+##### Method Declaration 
+
+    private static ArrayList GetAvailableExchangeCodes(FlowrouteNumbersAndMessagingClient client)
+    {
+        ArrayList return_list = new ArrayList();
+
+        int? limit = 2;
+        int? offset = 0;
+        double? maxSetupCost = 3.40;
+        string areacode = "206";
+
+        // User the Numbers Controller from our Client
+        NumbersController numbers = client.Numbers;
+
+        do
+        {
+            dynamic exchanges_data = numbers.ListAvailableExchangeCodes(limit, offset, maxSetupCost, areacode);
+            Console.WriteLine(exchanges_data);
+
+            foreach (var item in exchanges_data.data)
+            {
+                Console.WriteLine("---------------------------\nAvailable Exchange:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((string)item.id);
+            }
+
+            // See if there is more data to process
+            var links = exchanges_data.links;
+            if (links.next != null)
+            {
+                // more data to pull
+                offset += limit;
+            }
+            else
+            {
+                break;   // no more data
+            }
+        } 
+        while (true);
+
+        return return_list;
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of exchange objects in JSON format.
+
+    {
+      "data": [
+        {
+          "type": "exchange",
+          "id": "347215",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available?starts_with=1347215"
+          }
+        },
+        {
+          "type": "exchange",
+          "id": "347325",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available?starts_with=1347325"
+          }
+        },
+        {
+          "type": "exchange",
+          "id": "347331",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/available?starts_with=1347331"
+          }
+        }
+      ],
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers/available/exchanges?areacode=347&limit=3&offset=0",
+        "next": "https://api.flowroute.com/v2/numbers/available/exchanges?areacode=347&limit=3&offset=3"
+      }
+    }
+
+
+#### GetAvailableNumbers(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares `startsWith`, `contains`, `endsWith`, `rateCenter`, `state`, `limit`, and `offset` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/search-for-purchasable-phone-numbers/).
+
+##### Method Declaration 
+
+    private static ArrayList GetAvailableNumbers(FlowrouteNumbersAndMessagingClient client)
+    {
+        string startsWith = "206";
+        string contains = null;
+        string endsWith = null;
+        string rateCenter = null;
+        string state = null;
+
+        int? limit = 5;
+        int? offset = 0;
+
+        ArrayList return_list = new ArrayList();
+        // User the Numbers Controller from our Client
+        NumbersController numbers = client.Numbers;
+        do
+        {
+            dynamic number_data = numbers.SearchForPurchasablePhoneNumbers(startsWith, contains, endsWith, limit, offset, rateCenter, state);
+            Console.WriteLine(number_data);
+            // Iterate through each number item
+            foreach (var item in number_data.data)
+            {
+                Console.WriteLine("---------------------------\nAvailable Area Codes:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((string)item.id);
+            }
+
+            // See if there is more data to process
+            var links = number_data.links;
+            if (links.next != null)
+            {
+                // more data to pull
+                offset += limit;
+            }
+            else
+            {
+                break;   // no more data
+            }
+        } while (true);
+
+        return return_list;
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is 200 OK and
+the response body contains an array of phone number objects in JSON
+format.
+
+    {
+      "data": [
+        {
+          "attributes": {
+            "rate_center": "nwyrcyzn01",
+            "value": "16463439507",
+            "monthly_cost": 1.25,
+            "state": "ny",
+            "number_type": "standard",
+            "setup_cost": 1
+          },
+          "type": "number",
+          "id": "16463439507",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/16463439507"
+          }
+        },
+        {
+          "attributes": {
+            "rate_center": "nwyrcyzn01",
+            "value": "16463439617",
+            "monthly_cost": 1.25,
+            "state": "ny",
+            "number_type": "standard",
+            "setup_cost": 1
+          },
+          "type": "number",
+          "id": "16463439617",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/16463439617"
+          }
+        },
+        {
+          "attributes": {
+            "rate_center": "nwyrcyzn01",
+            "value": "16463439667",
+            "monthly_cost": 1.25,
+            "state": "ny",
+            "number_type": "standard",
+            "setup_cost": 3.99
+          },
+          "type": "number",
+          "id": "16463439667",
+          "links": {
+            "related": "https://api.flowroute.com/v2/numbers/16463439667"
+          }
+        }
+      ],
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers/available?contains=3&ends_with=7&starts_with=1646&limit=3&offset=0",
+        "next": "https://api.flowroute.com/v2/numbers/available?contains=3&ends_with=7&starts_with=1646&limit=3&offset=3"
+      }
+    }
+
+
+
+#### GetNumbers(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares startsWith, contains, endsWith, rateCenter, state,
+limit, and offset as parameters which you can learn more about in the
+[API
+reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-phone-numbers/).
+
+##### Method Declaration 
+
+    public static ArrayList GetNumbers(FlowrouteNumbersAndMessagingClient client)
+    {
+        ArrayList return_list = new ArrayList();
+
+        // List all phone numbers in our account paging through them 1 at a time
+        //  If you have several phone numbers, change the 'limit' variable below
+        //  This example is intended to show how to page through a list of resources
+
+        int? limit = 100;
+        int? offset = 0;
+
+        int? startsWith = null;
+        int? endsWith = null;
+        int? contains = null;
+
+        // User the Numbers Controller from our Client
+        NumbersController numbers = client.Numbers;
+        do
+        {
+            dynamic number_data = numbers.GetAccountPhoneNumbers(startsWith, endsWith, contains, limit, offset);
+
+            // Iterate through each number item
+            foreach (var item in number_data.data)
+            {
+                Console.WriteLine("---------------------------\nPhone Number Record:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((string)item.id);
+            }
+
+            // See if there is more data to process
+            var links = number_data.links;
+            if(links.next != null) 
+            {
+                // more data to pull
+                offset += limit;
+            } else {
+                break;   // no more data
+            }
+        }
+        while (true);
+
+        Console.WriteLine("Processing Complete");
+        return return_list;
+    }
+
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is 200 OK and
+the response body contains an array of phone number objects in JSON
+format.
+
+    {
+      "data": [
+        {
+          "attributes": {
+            "rate_center": "oradell",
+            "value": "12012673227",
+            "alias": null,
+            "state": "nj",
+            "number_type": "standard",
+            "cnam_lookups_enabled": true
+          },
+          "type": "number",
+          "id": "12012673227",
+          "links": {
+            "self": "https://api.flowroute.com/v2/numbers/12012673227"
+          }
+        },
+        {
+          "attributes": {
+            "rate_center": "jerseycity",
+            "value": "12014845220",
+            "alias": null,
+            "state": "nj",
+            "number_type": "standard",
+            "cnam_lookups_enabled": true
+          },
+          "type": "number",
+          "id": "12014845220",
+          "links": {
+            "self": "https://api.flowroute.com/v2/numbers/12014845220"
+          }
+        }
+      ],
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers?starts_with=1201&limit=3&offset=0"
+      }
+    }
+
+
+#### GetNumberDetails(FlowrouteNumbersAndMessagingClient client, string id) 
+
+The method declares the id as a variable which you can learn more about
+in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-phone-number-details/). 
+
+##### Method Declaration 
+
+    public static dynamic GetNumberDetails(FlowrouteNumbersAndMessagingClient client, string id) 
+    {
+        // User the Numbers Controller from our Client
+        NumbersController numbers = client.Numbers;
+
+        Console.WriteLine("---------------------------\nList Phone Number Details:\n");
+        dynamic result = numbers.GetPhoneNumberDetails(id);
+        Console.WriteLine(result);
+        return result;
+
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains a phone number object in JSON format.
+
+    {
+      "included": [
+        {
+          "attributes": {
+            "route_type": "sip-reg",
+            "alias": "sip-reg",
+            "value": null
+          },
+          "type": "route",
+          "id": "0",
+          "links": {
+            "self": "https://api.flowroute.com/v2/routes/0"
+          }
+        }
+      ],
+      "data": {
+        "relationships": {
+          "cnam_preset": {
+            "data": null
+          },
+          "e911_address": {
+            "data": null
+          },
+          "failover_route": {
+            "data": null
+          },
+          "primary_route": {
+            "data": {
+              "type": "route",
+              "id": "0"
+            }
+          }
+        },
+        "attributes": {
+          "rate_center": "millbrae",
+          "value": "16502390214",
+          "alias": null,
+          "state": "ca",
+          "number_type": "standard",
+          "cnam_lookups_enabled": true
+        },
+        "type": "number",
+        "id": "16502390214",
+        "links": {
+          "self": "https://api.flowroute.com/v2/numbers/16502390214"
+        }
+      },
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers/16502390214"
+      }
+    }
+
+### Route Management 
+
+The Flowroute .NET Library v3 allows you to make HTTP requests to the `routes` resource of Flowroute API v2: `https://api.flowroute.com/v2/routes`
+
+#### CreateInboundRoute(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares the route object in JSON format as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/create-an-inbound-route/). In the following example, we declare a test route with `route_type` "host".
+
+##### Method Declaration
+
+    private static void CreateInboundRoute(FlowrouteNumbersAndMessagingClient client)
+    {
+        RoutesController routes = client.Routes;
+        NewRoute body = new NewRoute();
+        body.Data = new Data61();
+        body.Data.Attributes = new Attributes62();
+        body.Data.Attributes.Alias = "Test Route";
+        body.Data.Attributes.RouteType = RouteTypeEnum.HOST;
+        body.Data.Attributes.Value = "www.flowroute.com";
+
+        string result = routes.CreateAnInboundRoute(body);
+        Console.WriteLine(result);
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `201 Created` and the response body contains a route object in JSON format.
+
+    {
+      "data": {
+        "attributes": {
+          "alias": "Test Route",
+          "route_type": "host",
+          "value": "www.flowroute.com"
+        },
+        "id": "98396",
+        "links": {
+          "self": "https://api.flowroute.com/routes/98396"
+        },
+        "type": "route"
+      },
+      "links": {
+        "self": "https://api.flowroute.com/routes/98396"
+      }
+    }
+
+
+
+#### GetInboundRoutes(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares limit and offset as parameters which you can learn more about in the [API
+reference](https://developer.flowroute.com/api/numbers/v2.0/list-inbound-routes/).
+
+##### Method Declaration 
+
+    private static ArrayList GetInboundRoutes(FlowrouteNumbersAndMessagingClient client)
+    {
+        ArrayList return_list = new ArrayList();
+
+        int? limit = 10;
+        int? offset = 0;
+
+        RoutesController routes = client.Routes;
+
+        do
+        {
+            dynamic route_data = routes.ListInboundRoutes(limit, offset);
+            Console.WriteLine(route_data);
+
+            foreach (var item in route_data.data)
+            {
+                Console.WriteLine("---------------------------\nInbound Routes:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((dynamic)item);
+            }
+
+            // See if there is more data to process
+            var links = route_data.links;
+            if (links.next != null)
+            {
+                // more data to pull
+                offset += limit;
+            }
+            else
+            {
+                break;   // no more data
+            }
+
+        }
+        while (true);
+
+        return return_list;
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of route objects in JSON format.
+
+    {
+      "data": [
+        {
+          "attributes": {
+            "route_type": "sip-reg",
+            "alias": "sip-reg",
+            "value": null
+          },
+          "type": "route",
+          "id": "0",
+          "links": {
+            "self": "https://api.flowroute.com/v2/routes/0"
+          }
+        },
+        {
+          "attributes": {
+            "route_type": "number",
+            "alias": "PSTNroute1",
+            "value": "12065551212"
+          },
+          "type": "route",
+          "id": "83834",
+          "links": {
+            "self": "https://api.flowroute.com/v2/routes/83834"
+          }
+        }
+      ],
+      "links": {
+        "self": "https://api.flowroute.com/v2/routes?limit=2&offset=0",
+        "next": "https://api.flowroute.com/v2/routes?limit=2&offset=2"
+      }
+    }
+
+
+#### UpdatePrimaryRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) 
+
+The method updates a DID with the route\_id parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-primary-voice-route/).
+
+##### Method Declaration 
+
+     private static void UpdatePrimaryRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route_id)
+    {
+        RoutesController routes = client.Routes;
+        string result = routes.UpdatePrimaryVoiceRouteForAPhoneNumber(DID, route_id);
+        Console.WriteLine(result);
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+    204: No Content
+
+
+#### UpdateFailoverRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route\_id) 
+
+The method updates a DID with the `route_id` parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/update-number-failover-voice-route/).
+
+##### Method Declaration 
+
+    private static void UpdateFailoverRoute(FlowrouteNumbersAndMessagingClient client, string DID, string route_id)
+    {
+        RoutesController routes = client.Routes;
+        string result = routes.UpdateFailoverVoiceRouteForAPhoneNumber(DID, route_id);
+        Console.WriteLine(result);
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+    204: No Content
+
+
+### Messaging 
+
+The Flowroute .NET Library v3 allows you to make HTTP requests to the `messages` resource of Flowroute API v2.1: `https://api.flowroute.com/v2.1/messages`
+
+#### SendSMS(FlowrouteNumbersAndMessagingClient client, string from\_did) 
+
+The method declares a message object in JSON format as a parameter which you can learn more about in the API References for [MMS](https://developer.flowroute.com/api/messages/v2.1/send-an-mms/) and [SMS](https://developer.flowroute.com/api/messages/v2.1/send-an-sms/). In the following example, we are sending an SMS from the previously declared `from_did` to your mobile number.
+
+##### Method Declaration {#examplerequest-10}
+
+      private static void SendSMS(FlowrouteNumbersAndMessagingClient client, string from_did)
+    {
+        Message msg = new Message();
+        msg.From = from_did;
+        msg.To = "YOUR_MOBILE_NUMBER"; // Replace with your mobile number to receive messages sent from your Flowroute account
+        msg.Body = "Hi Chris";
+
+        MessagesController messages = client.Messages;
+        string result = messages.CreateSendAMessage(msg);
+        Console.WriteLine(result);
+    }
+
+
+Note that this function call is currently commented out. Uncomment to test the `SendSMS` method.
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `202 Accepted` and the response body contains the message record ID with mdr2 prefix.
+
+    {
+      "data": {
+        "links": {
+          "self": "https://api.flowroute.com/v2.1/messages/mdr2-39cadeace66e11e7aff806cd7f24ba2d"
+        },
+        "type": "message",
+        "id": "mdr2-39cadeace66e11e7aff806cd7f24ba2d"
+      }
+    }
+
+
+
+#### GetMessages(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares `startDate`, `endDate`, `limit`, and `offset` as parameters which you can learn more about in the [API Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-set-of-messages/).
+
+##### Method Declaration 
+
+    public static ArrayList GetMessages(FlowrouteNumbersAndMessagingClient client)
+    {
+        ArrayList return_list = new ArrayList();
+        int? limit = 100;
+        int? offset = 0;
+
+        // Find all messages since January 1, 2017
+        DateTime startDate = new DateTime(2017, 1, 1);
+        DateTime? endDate = null;
+
+        do
+        {
+            MessagesController messages = client.Messages;
+            dynamic message_data = messages.GetLookUpASetOfMessages(startDate, endDate, limit, offset);
+
+            // Iterate through each number item
+            foreach (var item in message_data.data)
+            {
+                Console.WriteLine("---------------------------\nSMS MDR:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((string)item.id);
+            }
+
+            // See if there is more data to process
+            var links = message_data.links;
+            if (links.next != null)
+            {
+                // more data to pull
+                offset += limit;
+            }
+            else
+            {
+                break;   // no more data
+            }
+        }
+        while (true);
+        return return_list;
+    }
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of message objects in JSON format.
+
+    {
+      "data": [
+        {
+          "attributes": {
+            "body": "Hello are you there? ",
+            "status": "delivered",
+            "direction": "inbound",
+            "amount_nanodollars": 4000000,
+            "to": "12012673227",
+            "message_encoding": 0,
+            "timestamp": "2017-12-22T01:52:39.39Z",
+            "delivery_receipts": [],
+            "amount_display": "$0.0040",
+            "from": "12061231234",
+            "is_mms": false,
+            "message_type": "longcode"
+          },
+          "type": "message",
+          "id": "mdr2-ca82be46e6ba11e79d08862d092cf73d"
+        },
+        {
+          "attributes": {
+            "body": "test sms on v2",
+            "status": "message buffered",
+            "direction": "outbound",
+            "amount_nanodollars": 4000000,
+            "to": "12061232634",
+            "message_encoding": 0,
+            "timestamp": "2017-12-21T16:44:34.93Z",
+            "delivery_receipts": [
+              {
+                "status": "message buffered",
+                "status_code": 1003,
+                "status_code_description": "Message accepted by Carrier",
+                "timestamp": "2017-12-21T16:44:35.00Z",
+                "level": 2
+              },
+              {
+                "status": "smsc submit",
+                "status_code": null,
+                "status_code_description": "Message has been sent",
+                "timestamp": "2017-12-21T16:44:35.00Z",
+                "level": 1
+              }
+            ],
+            "amount_display": "$0.0040",
+            "from": "12012673227",
+            "is_mms": false,
+            "message_type": "longcode"
+          },
+          "type": "message",
+          "id": "mdr2-39cadeace66e11e7aff806cd7f24ba2d"
+        }
+      ],
+      "links": {
+        "next": "https://api.flowroute.com/v2.1/messages?limit=2&start_date=2017-12-01T00%3A00%3A00%2B00%3A00&end_date=2018-01-08T00%3A00%3A00%2B00%3A00&offset=2"
+      }
+    }
+
+
+#### GetMDRDetail(FlowrouteNumbersAndMessagingClient client, string id) 
+
+The method declares a message `id` in MDR2 format as a variable which you can learn more about in the [API
+Reference](https://developer.flowroute.com/api/messages/v2.1/look-up-a-message-detail-record/). In the following example, we retrieve the details of the first message in our look\_up\_a\_set\_of\_messages search result.
+
+##### Method Declaration 
+
+      private static void GetMDRDetail(FlowrouteNumbersAndMessagingClient client, string id)
+    {
+        MessagesController messages = client.Messages;
+
+        dynamic mdr_data = messages.GetLookUpAMessageDetailRecord(id);   
+        Console.WriteLine(mdr_data);
+    }
+    result = messages_controller.look_up_a_message_detail_record(message_id)
+    pprint.pprint(result)
+
+
+##### Example Response 
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains the message object for our specified message `id`.
+
+    {
+      "data": {
+        "attributes": {
+          "body": "Hello are you there? ",
+          "status": "delivered",
+          "direction": "inbound",
+          "amount_nanodollars": 4000000,
+          "to": "12012673227",
+          "message_encoding": 0,
+          "timestamp": "2017-12-22T01:52:39.39Z",
+          "delivery_receipts": [],
+          "amount_display": "$0.0040",
+          "from": "12061232634",
+          "is_mms": false,
+          "message_type": "longcode"
+        },
+        "type": "message",
+        "id": "mdr2-ca82be46e6ba11e79d08862d092cf73d"
+      }
+    }
+
+
+Errors 
+------
+
+In cases of HTTP errors, the .NET library displays a pop-up window with an error message next to the line of code that caused the error. You can add more error logging if necessary.
+
+### Example Error 
+
+![dot-net-error.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-error.png?raw=true)

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,7 +7,8 @@
     <ProjectGuid>{98FB6D29-30D5-4C20-8DB2-A88A3520D24B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>testSDK</RootNamespace>
-    <AssemblyName>testSDK</AssemblyName>
+    <AssemblyName>FlowrouteNumbersAndMessaging.Standard</AssemblyName>
+    <Version>3.0.0</Version>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FlowrouteNumbersAndMessaging.Standard">
-      <HintPath>..\..\FlowrouteNumbersAndMessaging.Standard\bin\Debug\netstandard1.3\FlowrouteNumbersAndMessaging.Standard.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +43,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="FlowrouteNumbersAndMessaging.Standard">
+      <HintPath>..\..\FlowrouteNumbersAndMessaging.Standard\bin\Debug\netstandard1.3\FlowrouteNumbersAndMessaging.Standard.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
