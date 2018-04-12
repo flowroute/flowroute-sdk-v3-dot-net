@@ -46,6 +46,9 @@ namespace testSDK
             // List Inbound Routes
             ArrayList inbound_routes = GetInboundRoutes(client);
 
+            // List available Edge Strategies
+            ArrayList edge_strategies = GetEdgeStrategies(client);
+
             // Create an Inbound Route
             CreateInboundRoute(client);
 
@@ -77,6 +80,7 @@ namespace testSDK
             body.Data.Attributes.Alias = "Test Route";
             body.Data.Attributes.RouteType = RouteTypeEnum.HOST;
             body.Data.Attributes.Value = "www.flowroute.com";
+            body.Data.Attributes.EdgeStrategy = "1";
 
             string result = routes.CreateAnInboundRoute(body);
             Console.WriteLine(result);
@@ -131,6 +135,26 @@ namespace testSDK
 
             }
             while (true);
+
+            return return_list;
+        }
+
+
+        private static ArrayList GetEdgeStrategies(FlowrouteNumbersAndMessagingClient client)
+        {
+            ArrayList return_list = new ArrayList();
+
+            RoutesController routes = client.Routes;
+
+            dynamic route_data = routes.ListEdgeStrategies();
+            Console.WriteLine(route_data);
+
+            foreach (var item in route_data.data)
+            {
+                Console.WriteLine("---------------------------\nEdge Strategies:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((dynamic)item);
+            }
 
             return return_list;
         }

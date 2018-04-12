@@ -18,24 +18,25 @@ using FlowrouteNumbersAndMessaging.Standard.Utilities;
 
 namespace FlowrouteNumbersAndMessaging.Standard.Models
 {
-    public class Attributes62 : BaseModel 
+    public class Attributes62 : BaseModel
     {
         // These fields hold the values for the public properties.
         private string malias;
         private Models.RouteTypeEnum routeType = Models.RouteTypeEnum.SIPREG;
         private string mvalue;
+        private string medge_strategy_id;
 
         /// <summary>
         /// TODO: Write general description for this method
         /// </summary>
         [JsonProperty("alias")]
-        public string Alias 
-        { 
-            get 
+        public string Alias
+        {
+            get
             {
-                return this.malias; 
-            } 
-            set 
+                return this.malias;
+            }
+            set
             {
                 this.malias = value;
                 onPropertyChanged("Alias");
@@ -46,13 +47,13 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         /// TODO: Write general description for this method
         /// </summary>
         [JsonProperty("route_type", ItemConverterType = typeof(StringValuedEnumConverter))]
-        public Models.RouteTypeEnum RouteType 
-        { 
-            get 
+        public Models.RouteTypeEnum RouteType
+        {
+            get
             {
-                return this.routeType; 
-            } 
-            set 
+                return this.routeType;
+            }
+            set
             {
                 this.routeType = value;
                 onPropertyChanged("RouteType");
@@ -63,16 +64,33 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         /// TODO: Write general description for this method
         /// </summary>
         [JsonProperty("value")]
-        public string Value 
-        { 
-            get 
+        public string Value
+        {
+            get
             {
-                return this.mvalue; 
-            } 
-            set 
+                return this.mvalue;
+            }
+            set
             {
                 this.mvalue = value;
                 onPropertyChanged("Value");
+            }
+        }
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("edge_strategy")]
+        public string EdgeStrategy
+        {
+            get
+            {
+                return this.medge_strategy_id;
+            }
+            set
+            {
+                this.medge_strategy_id = value;
+                onPropertyChanged("EdgeStrategy");
             }
         }
     }
