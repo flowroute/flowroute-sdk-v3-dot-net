@@ -43,6 +43,29 @@ namespace FlowrouteNumbersAndMessaging.Standard
                 return RoutesController.Instance;
             }
         }
+
+        /// <summary>
+        /// Singleton access to E911 controller
+        /// </summary>
+        public E911Controller E911s
+        {
+            get
+            {
+                return E911Controller.Instance;
+            }
+        }
+
+        /// <summary>
+        /// Singleton access to CNAM controller
+        /// </summary>
+        public CNAMsController CNAMs
+        {
+            get
+            {
+                return CNAMsController.Instance;
+            }
+        }
+
         /// <summary>
         /// The shared http client to use for all API calls
         /// </summary>

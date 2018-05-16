@@ -336,5 +336,66 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns a list of available edge strategies. From the list, you can then select a PoP for inbound routes.
+        /// </summary>
+        /// <return>Returns the void response from the API call</return>
+        public dynamic ListEdgeStrategies(int? limit = null, int? offset = null)
+        {
+            Task<dynamic> t = ListEdgeStrategiesAsync(limit, offset);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Returns a list of available edge strategies. From the list, you can then select a PoP for inbound routes.
+        /// </summary>
+        /// <return>Returns the void response from the API call</return>
+        public async Task<dynamic> ListEdgeStrategiesAsync(int? limit = null, int? offset = null)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/routes/edge_strategies");
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Get(_queryUrl, _headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new APIException(@"Unauthorized", _context);
+
+            if (_response.StatusCode == 404)
+                throw new APIException(@"Not Found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
     }
 } 

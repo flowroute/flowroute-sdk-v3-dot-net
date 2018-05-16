@@ -21,16 +21,16 @@ namespace testSDK
             ArrayList our_numbers = GetNumbers(client);
 
             // List all our SMS Messages
-            ArrayList our_messages = GetMessages(client);
+            //ArrayList our_messages = GetMessages(client);
 
             // Send an SMS Message from our account
-            SendSMS(client, (string)our_numbers[0]);
+            //SendSMS(client, (string)our_numbers[0]);
 
             // Send an SMS Message from our account
-            SendMMS(client, (string)our_numbers[0]);
+            //SendMMS(client, (string)our_numbers[0]);
 
             // Look up a specific MDR
-            GetMDRDetail(client, (string)our_messages[0]);
+            //GetMDRDetail(client, (string)our_messages[0]);
 
             // Find details for a specific number
             dynamic number_details = GetNumberDetails(client, (string)our_numbers[0]);
@@ -46,6 +46,9 @@ namespace testSDK
 
             // List Inbound Routes
             ArrayList inbound_routes = GetInboundRoutes(client);
+
+            // List available Edge Strategies
+            ArrayList edge_strategies = GetEdgeStrategies(client);
 
             // Create an Inbound Route
             CreateInboundRoute(client);
@@ -67,6 +70,18 @@ namespace testSDK
                 break;
             }
             UpdateFailoverRoute(client, (string)our_numbers[0], route_id);
+
+            // List E911 Records
+            ArrayList our_e911s = GetE911Records(client);
+
+            // Validate an E911 Address
+            ValidateE911(client);
+
+            // Create an E911 Address
+            CreateE911Address(client);
+
+            // Associate an E911 Address with a DID
+            AssociateE911(client, (string)our_numbers[0], (string)our_e911s[0]);
         }
 
         private static void CreateInboundRoute(FlowrouteNumbersAndMessagingClient client)
@@ -78,6 +93,7 @@ namespace testSDK
             body.Data.Attributes.Alias = "Test Route";
             body.Data.Attributes.RouteType = RouteTypeEnum.HOST;
             body.Data.Attributes.Value = "www.flowroute.com";
+            body.Data.Attributes.EdgeStrategy = "1";
 
             string result = routes.CreateAnInboundRoute(body);
             Console.WriteLine(result);
@@ -132,6 +148,26 @@ namespace testSDK
 
             }
             while (true);
+
+            return return_list;
+        }
+
+
+        private static ArrayList GetEdgeStrategies(FlowrouteNumbersAndMessagingClient client)
+        {
+            ArrayList return_list = new ArrayList();
+
+            RoutesController routes = client.Routes;
+
+            dynamic route_data = routes.ListEdgeStrategies();
+            Console.WriteLine(route_data);
+
+            foreach (var item in route_data.data)
+            {
+                Console.WriteLine("---------------------------\nEdge Strategies:\n");
+                Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                return_list.Add((dynamic)item);
+            }
 
             return return_list;
         }
@@ -389,6 +425,98 @@ namespace testSDK
             Console.WriteLine(result);
             return result;
 
+        }
+
+        public static dynamic GetE911Records(FlowrouteNumbersAndMessagingClient client)
+        {
+            ArrayList return_list = new ArrayList();
+
+            // List all E911 records in our account paging through them 1 at a time
+            //  If you have several phone numbers, change the 'limit' variable below
+            //  This example is intended to show how to page through a list of resources
+
+            int? limit = 100;
+            int? offset = 0;
+
+            E911Controller e911s = client.E911s;
+            do
+            {
+                dynamic e911_data = e911s.ListE911s(limit, offset);
+
+                // Iterate through each number item
+                foreach (var item in e911_data.data)
+                {
+                    Console.WriteLine("---------------------------\nE911 Record:\n");
+                    Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                    return_list.Add((string)item.id);
+                }
+
+                // See if there is more data to process
+                var links = e911_data.links;
+                if (links.next != null)
+                {
+                    // more data to pull
+                    offset += limit;
+                }
+                else
+                {
+                    break;   // no more data
+                }
+            }
+            while (true);
+
+            Console.WriteLine("Processing Complete");
+            return return_list;
+        }
+
+        public static dynamic ValidateE911(FlowrouteNumbersAndMessagingClient client)
+        {
+            E911Controller e911s = client.E911s;
+            E911 body = new E911();
+            body.StreetName = "N Vassault";
+            body.StreetNumber = "3901";
+            body.AddressType = "R";
+            body.AddressTypeNumber = null;
+            body.City = "Tacoma";
+            body.State = "WA";
+            body.Country = "USA";
+            body.FirstName = "John";
+            body.LastName = "Doe";
+            body.Label = "Home";
+            body.Zip = "98407";
+
+            dynamic result = e911s.ValidateE911(body);
+            Console.WriteLine(result);
+            return result;
+        }
+
+        public static dynamic CreateE911Address(FlowrouteNumbersAndMessagingClient client)
+        {
+            E911Controller e911s = client.E911s;
+            E911 body = new E911();
+            body.StreetName = "3rd Ave";
+            body.StreetNumber = "1111";
+            body.AddressType = "B";
+            body.AddressTypeNumber = null;
+            body.City = "Seattle";
+            body.State = "WA";
+            body.Country = "USA";
+            body.FirstName = "John";
+            body.LastName = "Doe";
+            body.Label = "Potbelly";
+            body.Zip = "98101";
+
+            dynamic result = e911s.CreateE911Address(body);
+            Console.WriteLine(result);
+            return result;
+        }
+
+        public static dynamic AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)
+        {
+            E911Controller e911s = client.E911s;
+            dynamic result = e911s.AssociateE911(number_id, e911_id);
+            Console.WriteLine(result);
+            return result;
         }
     }
 }
