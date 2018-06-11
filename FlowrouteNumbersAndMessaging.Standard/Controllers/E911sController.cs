@@ -117,6 +117,75 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
+        /// Returns a list of your E911 records. 
+        /// </summary>
+        /// <param name="e911id">Optional parameter: Id of e911 record to work with.</param>
+        /// <return>Returns the void response from the API call</return>
+        public dynamic E911Details(string e911id)
+        {
+            Task<dynamic> t = E911DetailsAsync(e911id);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Returns a list of your E911 records. 
+        /// </summary>
+        /// <param name="e911id">Optional parameter: Id of e911 record to work with.</param>
+        /// <return>Returns the void response from the API call</return>
+        public async Task<dynamic> E911DetailsAsync(string e911Id)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/e911s/{e911_id}");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "e911_id", e911Id}
+            });
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string,string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Get(_queryUrl,_headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse) await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request,_response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new APIException(@"Unauthorized", _context);
+
+            if (_response.StatusCode == 404)
+                throw new APIException(@"Not Found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
         /// Creates a new inbound route which can then be associated with phone numbers. Please see "List Inbound Routes" to review the route values that you can associate with your Flowroute phone numbers.
         /// </summary>
         /// <param name="body">Required parameter: The new inbound route to be created.</param>
@@ -187,10 +256,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
-        /// Use this endpoint to update the primary voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
+        /// Use this endpoint to create an E911 Address record.
         /// </summary>
-        /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the primary route for voice will be assigned.</param>
-        /// <param name="routeId">Required parameter: The primary route to be assigned.</param>
+        /// <param name="body">Required parameter: An E911 Address object
         /// <return>Returns the string response from the API call</return>
         public string CreateE911Address(Models.E911 body)
         {
@@ -200,10 +268,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
-        /// Use this endpoint to update the primary voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
+        /// Use this endpoint to create an E911 Address record.
         /// </summary>
-        /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the primary route for voice will be assigned.</param>
-        /// <param name="routeId">Required parameter: The primary route to be assigned.</param>
+        /// <param name="body">Required parameter: An E911 Address object
         /// <return>Returns the string response from the API call</return>
         public async Task<string> CreateE911AddressAsync(Models.E911 body)
         {
@@ -245,6 +312,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             if (_response.StatusCode == 404)
                 throw new ErrorException(@"The specified resource was not found", _context);
 
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Insufficient funds to perform this operation.", _context);
+
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
@@ -259,10 +329,10 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
-        /// Use this endpoint to update the failover voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
+        /// Use this endpoint to associate an E911 record with a DID.
         /// </summary>
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the failover route for voice will be assigned.</param>
-        /// <param name="routeID">Required parameter: The failover route to be assigned.</param>
+        /// <param name="e911ID">Required parameter: The id of the E911 record to assciate.</param>
         /// <return>Returns the string response from the API call</return>
         public string AssociateE911(string numberId, string e911Id)
         {
@@ -272,10 +342,10 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         }
 
         /// <summary>
-        /// Use this endpoint to update the failover voice route for a phone number. You must create the route first by following "Create an Inbound Route". You can then assign the created route by specifying its value in a PATCH request.
+        /// Use this endpoint to associate an E911 record with a DID.
         /// </summary>
         /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to which the failover route for voice will be assigned.</param>
-        /// <param name="body">Required parameter: The failover route to be assigned.</param>
+        /// <param name="e911ID">Required parameter: The id of the E911 record to assciate.</param>
         /// <return>Returns the string response from the API call</return>
         public async Task<string> AssociateE911Async(string numberId, string e911Id)
         {
@@ -319,6 +389,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             if (_response.StatusCode == 404)
                 throw new ErrorException(@"The specified resource was not found", _context);
 
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Insufficient funds to perform this operation.", _context);
+
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
@@ -331,5 +404,222 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
                 throw new APIException("Failed to parse the response: " + _ex.Message, _context);
             }
         }
+
+        /// <summary>
+        /// Use this endpoint to remove a E911 association from a DID.
+        /// </summary>
+        /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to work with.</param>
+        /// <return>Returns the string response from the API call</return>
+        public string UnassociateE911(string numberId)
+        {
+            Task<string> t = UnassociateE911Async(numberId);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Use this endpoint to remove a E911 association from a DID.
+        /// </summary>
+        /// <param name="numberId">Required parameter: The phone number in E.164 11-digit North American format to work with.</param>
+        /// <return>Returns the string response from the API call</return>
+        public async Task<string> UnassociateE911Async(string numberId)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/numbers/{number_id}/relationships/e911s");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "number_id", numberId}
+            });
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "content-type", "text/plain; charset=utf-8" }
+            };
+
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Delete(_queryUrl, _headers, null, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Insufficient funds to perform this operation.", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.Body;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
+        /// Use this endpoint to remove an E911 record.
+        /// </summary>
+        /// <param name="e911Id">Required parameter: The id of the E911 record to remove.</param>
+        /// <return>Returns the string response from the API call</return>
+        public string DeleteE911(string e911Id)
+        {
+            Task<string> t = DeleteE911Async(e911Id);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Use this endpoint to remove an E911 record.
+        /// </summary>
+        /// <param name="e911Id">Required parameter: The id of the E911 record to remove.</param>
+        /// <return>Returns the string response from the API call</return>
+        public async Task<string> DeleteE911Async(string e911Id)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/e911s/{e911_id}");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "e911_id", e911Id}
+            });
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "content-type", "text/plain; charset=utf-8" }
+            };
+
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Delete(_queryUrl, _headers, null, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.Body;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a list of all DIDs associated with the specified E911 Record.
+        /// </summary>
+        /// <param name="e911id">Required parameter: Which record are we interested in.</param>
+        /// <return>Returns the void response from the API call</return>
+        public dynamic ListDidsForE911(string e911id)
+        {
+            Task<dynamic> t = ListDidsForE911Async(e911id);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Returns a list of all DIDs associated with the specified E911 Record.
+        /// </summary>
+        /// <param name="e911id">Required parameter: Which record are we interested in.</param>
+        /// <return>Returns the void response from the API call</return>
+        public async Task<dynamic> ListDidsForE911Async(string e911id)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/e911s/{e911_id}/relationships");
+
+            //process optional query parameters
+            APIHelper.AppendUrlWithQueryParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "e911_id", e911id },
+            }, ArrayDeserializationFormat, ParameterSeparator);
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "Flowroute SDK v3.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Get(_queryUrl, _headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return APIHelper.JsonDeserialize<dynamic>(_response.Body);
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
     }
 } 

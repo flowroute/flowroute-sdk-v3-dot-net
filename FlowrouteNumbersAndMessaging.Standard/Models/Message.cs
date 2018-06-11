@@ -15,8 +15,6 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         private string mfrom;
         private string to;
         private string body;
-        //private List<string> mediaUrls;
-        //private bool? isMms;
 
         /// <summary>
         /// TODO: Write general description for this method
@@ -68,41 +66,6 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
                 onPropertyChanged("Body");
             }
         }
-        /*
-        /// <summary>
-        /// TODO: Write general description for this method
-        /// </summary>
-        [JsonProperty("media_urls")]
-        public List<string> MediaUrls 
-        { 
-            get 
-            {
-                return this.mediaUrls; 
-            } 
-            set 
-            {
-                this.mediaUrls = value;
-                onPropertyChanged("MediaUrls");
-            }
-        }
-
-        /// <summary>
-        /// TODO: Write general description for this method
-        /// </summary>
-        [JsonProperty("is_mms")]
-        public bool? IsMms 
-        { 
-            get 
-            {
-                return this.isMms; 
-            } 
-            set 
-            {
-                this.isMms = value;
-                onPropertyChanged("IsMms");
-            }
-        }
-        */
     }
 
     public class MMS_Message : BaseModel

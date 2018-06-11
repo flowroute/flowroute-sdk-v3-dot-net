@@ -13,7 +13,7 @@ using FlowrouteNumbersAndMessaging.Standard.Exceptions;
 
 namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 {
-    public partial class MessagesController: BaseController
+    public partial class MessagesController : BaseController
     {
         #region Singleton Pattern
 
@@ -158,7 +158,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
 
             //append request with appropriate headers and parameters
-            var _headers = new Dictionary<string,string>()
+            var _headers = new Dictionary<string, string>()
             {
                 { "user-agent", "Flowroute SDK v3.0" },
                 { "content-type", "application/vnd.api+json" }
@@ -166,14 +166,14 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             //append body params
             var _body = APIHelper.JsonSerialize(body);
-            Console.WriteLine("Body is : {0} ",_body);
+            Console.WriteLine("Body is : {0} ", _body);
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
 
             //invoke request and get response
-            HttpStringResponse _response = (HttpStringResponse) await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
-            HttpContext _context = new HttpContext(_request,_response);
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)
@@ -312,18 +312,18 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
 
             //append request with appropriate headers and parameters
-            var _headers = new Dictionary<string,string>()
+            var _headers = new Dictionary<string, string>()
             {
                 { "user-agent", "Flowroute SDK v3.0" },
                 { "content-type", "application/vnd.api+json" }
             };
 
             //prepare the API call request to fetch the response
-            HttpRequest _request = ClientInstance.Get(_queryUrl,_headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+            HttpRequest _request = ClientInstance.Get(_queryUrl, _headers, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
 
             //invoke request and get response
-            HttpStringResponse _response = (HttpStringResponse) await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
-            HttpContext _context = new HttpContext(_request,_response);
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)
@@ -345,5 +345,209 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Sets the Account Level SMS Callback URL.
+        /// </summary>
+        /// <param name="sms_url">Required parameter: The callback URL for all SMS messages
+        /// <return>Status Code, 204 on success 4xx on error</return>
+        public dynamic SetSMSCallback(string sms_url)
+        {
+            Task<dynamic> t = SetSMSCallbackAsync(sms_url);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Sets the Account Level callback url for all SMS Messages
+        /// </summary>
+        /// <param name="sms_url">Required parameter: The callback url for all SMS messages
+        /// <return>Returns the response from the API call</return>
+        public async Task<dynamic> SetSMSCallbackAsync(string sms_url)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2.1/messages/sms_callback");
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "accept", "application/json" }
+            };
+
+            //append body params
+            var _body = "{\"data\": {\"attributes\": {\"callback_url\": ";
+            _body += sms_url;
+            _body += "\"}}}";
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PutBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.StatusCode;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
+        /// Sets the Account Level MMS Callback URL.
+        /// </summary>
+        /// <param name="mms_url">Required parameter: The callback URL for all MMS messages
+        /// <return>Status Code, 204 on success 4xx on error</return>
+        public dynamic SetMMSCallback(string mms_url)
+        {
+            Task<dynamic> t = SetMMSCallbackAsync(mms_url);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Set the Account Level callback for all MMS messages.
+        /// </summary>
+        /// <param name="mms_url">Required parameter: The callback url for all MMS messages.
+        /// <return>Returns the response from the API call</return>
+        public async Task<dynamic> SetMMSCallbackAsync(string mms_url)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2.1/messages/mms_callback");
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+                {
+                    { "user-agent", "APIMATIC 2.0" },
+                    { "accept", "application/json" }
+                };
+
+            //append body params
+            var _body = "{\"data\": {\"attributes\": {\"callback_url\": ";
+            _body += mms_url;
+            _body += "\"}}}";
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PutBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.StatusCode;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
+        /// Sets the Account Level DLR Callback URL.
+        /// </summary>
+        /// <param name="dlr_url">Required parameter: The callback URL for all DLRs
+        /// <return>Status Code, 204 on success 4xx on error</return>
+        public dynamic SetDLRCallback(string dlr_url)
+        {
+            Task<dynamic> t = SetDLRCallbackAsync(dlr_url);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Set the Account Level callback for all DLRs
+        /// </summary>
+        /// <param name="dlr_url">Required parameter: The callback url for all DLRs.
+        /// <return>Returns the response from the API call</return>
+        public async Task<dynamic> SetDLRCallbackAsync(string dlr_url)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2.1/messages/dlr_callback");
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+                    {
+                        { "user-agent", "APIMATIC 2.0" },
+                        { "accept", "application/json" }
+                    };
+
+            //append body params
+            var _body = "{\"data\": {\"attributes\": {\"callback_url\": ";
+            _body += dlr_url;
+            _body += "\"}}}";
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PutBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.StatusCode;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
     }
-} 
+}
