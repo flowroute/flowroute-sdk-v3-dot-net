@@ -225,8 +225,6 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             var _body = "{\"data\": {\"type\": \"e911s\", \"attributes\": ";
             _body += APIHelper.JsonSerialize(body);
             _body += "}}";
-            Console.WriteLine("Passing body " + _body);
-
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
@@ -304,6 +302,86 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //invoke request and get response
             HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
             HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Insufficient funds to perform this operation.", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            try
+            {
+                return _response.Body;
+            }
+            catch (Exception _ex)
+            {
+                throw new APIException("Failed to parse the response: " + _ex.Message, _context);
+            }
+        }
+
+        /// <summary>
+        /// Use this endpoint to create an E911 Address record.
+        /// </summary>
+        /// <param name="body">Required parameter: An E911 Address object
+        /// <return>Returns the string response from the API call</return>
+        public string UpdateE911Address(Models.E911 body)
+        {
+            Task<string> t = UpdateE911AddressAsync(body);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Use this endpoint to create an E911 Address record.
+        /// </summary>
+        /// <param name="body">Required parameter: An E911 Address object
+        /// <return>Returns the string response from the API call</return>
+        public async Task<string> UpdateE911AddressAsync(Models.E911 body)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/e911s/{e911_id}");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "e911_id", body.Id}
+            });
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "APIMATIC 2.0" },
+                { "content-type", "application/json; charset=utf-8" }
+            };
+
+            //append body params
+            var _body = "{\"data\": {\"type\": \"e911s\", \"attributes\": ";
+            _body += APIHelper.JsonSerialize(body);
+            _body += "}}";
+            Console.WriteLine("Passing body " + _body);
+
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PatchBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+            Console.WriteLine("Response: " + _response.StatusCode);
+            Console.WriteLine("context: " + _response.Body);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)

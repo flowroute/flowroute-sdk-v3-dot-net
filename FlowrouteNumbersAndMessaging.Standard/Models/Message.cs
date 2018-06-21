@@ -15,6 +15,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         private string mfrom;
         private string to;
         private string body;
+        private string dlr_callback;
 
         /// <summary>
         /// TODO: Write general description for this method
@@ -66,6 +67,23 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
                 onPropertyChanged("Body");
             }
         }
+
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("dlr_callback")]
+        public string Callback
+        {
+            get
+            {
+                return this.dlr_callback;
+            }
+            set
+            {
+                this.dlr_callback = value;
+                onPropertyChanged("Callback");
+            }
+        }
     }
 
     public class MMS_Message : BaseModel
@@ -75,6 +93,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         private string to;
         private string body;
         private List<string> mediaUrls;
+        private string dlr_callback;
 
         /// <summary>
         /// TODO: Write general description for this method
@@ -144,6 +163,22 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
             }
         }
 
+        /// <summary>
+        /// TODO: Write general description for this method
+        /// </summary>
+        [JsonProperty("dlr_callback")]
+        public string Callback
+        {
+            get
+            {
+                return this.dlr_callback;
+            }
+            set
+            {
+                this.dlr_callback = value;
+                onPropertyChanged("Callback");
+            }
+        }
     }
 
 } 

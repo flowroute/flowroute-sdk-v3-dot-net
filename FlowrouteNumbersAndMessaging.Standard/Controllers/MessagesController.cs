@@ -240,7 +240,6 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             //append body params
             var _body = APIHelper.JsonSerialize(body);
-            Console.WriteLine("Body is : {0} ", _body);
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);

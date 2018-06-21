@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using FlowrouteNumbersAndMessaging.Standard;
 using FlowrouteNumbersAndMessaging.Standard.Controllers;
 using FlowrouteNumbersAndMessaging.Standard.Models;
+using FlowrouteNumbersAndMessaging.Standard.Utilities;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 
 namespace testSDK
 {
@@ -18,7 +20,7 @@ namespace testSDK
                                                                                                FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthPassword);
             // List all our numbers
             ArrayList our_numbers = GetNumbers(client);
-            /*
+
             // Find details for a specific number
             dynamic number_details = GetNumberDetails(client, (string)our_numbers[0]);
 
@@ -66,20 +68,27 @@ namespace testSDK
             }
             UpdateFailoverRoute(client, (string)our_numbers[0], route_id);
 
+            // Set an Alias for a DID
+            SetDidAlias(client, (string)our_numbers[0], "Our DID");
+
+            // Set DID Callback
+            SetDidCallback(client, (string)our_numbers[0], "http://www.example.com/callback");
+
             //-------------------- E911 --------------------------
-            */
             // List E911 Records
             ArrayList our_e911s = GetE911Records(client);
 
             // Show E911 Details
-            ListE911Details(client, (string)our_e911s[0]);
+            //ListE911Details(client, (string)our_e911s[0]);
 
-            /*
             // Validate an E911 Address
             ValidateE911(client);
 
             // Create an E911 Address
             CreateE911Address(client);
+
+            // Update an E911 Address
+            UpdateE911Address(client, (string)our_e911s[0], "New Address");
 
             // Associate an E911 Address with a DID
             AssociateE911(client, (string)our_numbers[0], (string)our_e911s[0]);
@@ -93,34 +102,33 @@ namespace testSDK
             // Remove an E911 Record
             DeleteE911(client, (string)our_e911s[0]);
 
-            */
             //----------------- Messaging --------------------------
 
             // List all our SMS Messages
-            //ArrayList our_messages = GetMessages(client);
+            ArrayList our_messages = GetMessages(client);
 
-            //string target_number = "14254664078";
+            string target_number = "YOUR MOBILE NUMBER HERE";
 
             // Send an SMS Message from our account
-            //SendSMS(client, (string)our_numbers[0], target_number);
+            SendSMS(client, (string)our_numbers[0], target_number);
 
             // Send an MMS Message from our account
-            //SendMMS(client, (string)our_numbers[0], target_number);
+            SendMMS(client, (string)our_numbers[0], target_number);
 
             // Look up a specific MDR
-            //GetMDRDetail(client, (string)our_messages[0]);
-
+            GetMDRDetail(client, (string)our_messages[0]);
 
             // Set Account Level Callback URL for SMS
-            //SetAccountLevelCallback(client, "SMS_callback", "http://www.example/com/sms");
+            SetAccountLevelCallback(client, "SMS_callback", "http://www.example/com/sms");
 
             // Set Account Level Callback URL for MMS
-            //SetAccountLevelCallback(client, "MMS_callback", "http://www.example/com/sms");
+            SetAccountLevelCallback(client, "MMS_callback", "http://www.example/com/sms");
 
             // Set Account Level DLR Callback URL
-            //SetAccountLevelCallback(client, "DLR_callback", "http://www.example/com/sms");
+            SetAccountLevelCallback(client, "DLR_callback", "http://www.example/com/sms");
 
             // Send an SMS Message and specify a custom DLR URL
+            SendSMS(client, (string)our_numbers[0], target_number, "http://httpbin.org/status/:code");
 
             //----------------- CNAM --------------------------
 
@@ -128,19 +136,27 @@ namespace testSDK
             ArrayList our_cnams = GetCNAMRecords(client);
 
             // Get details about a single CNAM Record
-            //GetCNAMDetail(client, (string)our_cnams[0]);
+            GetCNAMDetail(client, (string)our_cnams[0]);
 
             // Create a CNAM Record
-            //CreateCNAM(client, "Flowroute");
+            CreateCNAM(client, "Flowroute");
 
             // Associate a CNAM Record
-            //AssociateCNAM(client, (string)our_numbers[0], (string)our_cnams[0]);
+            AssociateCNAM(client, (string)our_numbers[0], (string)our_cnams[0]);
 
             // Unassociate a CNAM
-            //UnassociateCNAM(client, (string)our_numbers[0]);
+            UnassociateCNAM(client, (string)our_numbers[0]);
 
             // Delete a CNAM record
-            //DeleteCNAM(client, (string)our_cnams[0]);
+            DeleteCNAM(client, (string)our_cnams[0]);
+
+            //----------------- Portability -----------------------
+
+            // Check number portability
+            List<string> numbers_to_check = new List<string>();
+            numbers_to_check.Add("+14254664444");
+            numbers_to_check.Add("+18827833439");
+            var result = CheckPortability(client, numbers_to_check);
         }
 
         private static void CreateInboundRoute(FlowrouteNumbersAndMessagingClient client)
@@ -171,6 +187,21 @@ namespace testSDK
             string result = routes.UpdateFailoverVoiceRouteForAPhoneNumber(DID, route_id);
             Console.WriteLine(result);
         }
+
+        private static void SetDidAlias(FlowrouteNumbersAndMessagingClient client, string our_number, string new_alias)
+        {
+            NumbersController numbers = client.Numbers;
+            Int32 result = numbers.SetDIDAlias(our_number, new_alias);
+            Console.WriteLine(result);
+        }
+
+        private static void SetDidCallback(FlowrouteNumbersAndMessagingClient client, string DID, string url)
+        {
+            NumbersController numbers = client.Numbers;
+            Int32 result = numbers.SetDIDCallback(DID, url);
+            Console.WriteLine(result);
+        }
+
 
         private static ArrayList GetInboundRoutes(FlowrouteNumbersAndMessagingClient client)
         {
@@ -383,12 +414,13 @@ namespace testSDK
             Console.WriteLine(mdr_data);
         }
 
-        private static void SendSMS(FlowrouteNumbersAndMessagingClient client, string from_did, string to_did)
+        private static void SendSMS(FlowrouteNumbersAndMessagingClient client, string from_did, string to_did, string callback=null)
         {
             Message msg = new Message();
             msg.From = from_did;
             msg.To = to_did; // Replace with your mobile number to receive messages sent from your Flowroute account
             msg.Body = "Hi Chris";
+            msg.Callback = callback;
 
             MessagesController messages = client.Messages;
             string result = messages.CreateSendAMessage(msg);
@@ -608,6 +640,42 @@ namespace testSDK
             }
         }
 
+        public static dynamic UpdateE911Address(FlowrouteNumbersAndMessagingClient client, string e911_id, string new_label)
+        {
+            E911Controller e911s = client.E911s;
+            dynamic result = e911s.E911Details(e911_id);
+
+            string jsonstring = result.ToString();
+            Newtonsoft.Json.Linq.JObject j = Newtonsoft.Json.Linq.JObject.Parse(jsonstring);
+            string old_label = (string)j["data"]["attributes"]["label"];
+            E911 body = new E911();
+            body.AddressType = (string)j["data"]["attributes"]["address_type"];
+            body.AddressTypeNumber = (string)j["data"]["attributes"]["address_type_number"];
+            body.AdressNumber = (string)j["data"]["attributes"]["street_number"];
+            body.City = (string)j["data"]["attributes"]["city"];
+            body.Country = (string)j["data"]["attributes"]["country"];
+            body.FirstName = (string)j["data"]["attributes"]["first_name"];
+            body.Id = (string)j["data"]["id"];
+            body.LastName = (string)j["data"]["attributes"]["last_name"];
+            body.State = (string)j["data"]["attributes"]["state"];
+            body.StreetName = (string)j["data"]["attributes"]["street_name"];
+            body.StreetNumber = (string)j["data"]["attributes"]["street_number"];
+            body.Zip = (string)j["data"]["attributes"]["zip"];
+            body.Label = (string)new_label;
+
+            try
+            {
+                dynamic submissin_result = e911s.UpdateE911Address(body);
+                Console.WriteLine(result);
+                return result;
+            }
+            catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+
         public static dynamic AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)
         {
             E911Controller e911s = client.E911s;
@@ -798,5 +866,13 @@ namespace testSDK
             Console.WriteLine(return_data);
             return return_data;
         }
+
+        public static dynamic CheckPortability(FlowrouteNumbersAndMessagingClient client, List<string>numbers_to_check)
+        {
+            PortingController porting = client.Porting;
+            dynamic return_data = porting.CheckPortability(numbers_to_check);
+            return return_data;
+        }
+
     }
 }
