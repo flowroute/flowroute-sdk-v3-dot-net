@@ -67,6 +67,17 @@ namespace FlowrouteNumbersAndMessaging.Standard
         }
 
         /// <summary>
+        /// Singleton access to Porting controller
+        /// </summary>
+        public PortingController Porting
+        {
+            get
+            {
+                return PortingController.Instance;
+            }
+        }
+
+        /// <summary>
         /// The shared http client to use for all API calls
         /// </summary>
         public IHttpClient SharedHttpClient

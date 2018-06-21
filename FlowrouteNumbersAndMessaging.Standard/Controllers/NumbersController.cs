@@ -210,7 +210,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: Phone number to purchase. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
         /// <return>Returns the Models.Number26 response from the API call</return>
-        public Models.Number26 CreatePurchaseAPhoneNumber(int id)
+        public Models.Number26 CreatePurchaseAPhoneNumber(string id)
         {
             Task<Models.Number26> t = CreatePurchaseAPhoneNumberAsync(id);
             APIHelper.RunTaskSynchronously(t);
@@ -222,7 +222,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
         /// </summary>
         /// <param name="id">Required parameter: Phone number to purchase. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
         /// <return>Returns the Models.Number26 response from the API call</return>
-        public async Task<Models.Number26> CreatePurchaseAPhoneNumberAsync(int id)
+        public async Task<Models.Number26> CreatePurchaseAPhoneNumberAsync(string id)
         {
             //the base uri for api requests
             string _baseUri = Configuration.BaseUri;
@@ -262,6 +262,9 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             if (_response.StatusCode == 404)
                 throw new ErrorException(@"The specified resource was not found", _context);
 
+            if (_response.StatusCode == 403)
+                throw new ErrorException(@"Insufficient funds available to complete the request.", _context);
+
             //handle errors defined at the API level
             base.ValidateResponse(_response, _context);
 
@@ -275,6 +278,68 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             }
         }
 
+        /// <summary>
+        /// Lets you purchase a phone number from available Flowroute inventory.
+        /// </summary>
+        /// <param name="id">Required parameter: Phone number to purchase. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
+        /// <return>Returns the Models.Number26 response from the API call</return>
+        public Int32 ReleaseDID(string id)
+        {
+            Task<Int32> t = ReleaseDIDAsync(id);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Lets you purchase a phone number from available Flowroute inventory.
+        /// </summary>
+        /// <param name="id">Required parameter: Phone number to purchase. Must be in 11-digit E.164 format; e.g. 12061231234.</param>
+        /// <return>Returns the Models.Number26 response from the API call</return>
+        public async Task<Int32> ReleaseDIDAsync(string id)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/numbers/{id}");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "id", id }
+            });
+
+
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "Flowroute SDK v3.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.Delete(_queryUrl, _headers, null, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            return _response.StatusCode;
+        }
         /// <summary>
         /// This endpoint lets you search for phone numbers by state or rate center, or by your specified search value.
         /// </summary>
@@ -539,5 +604,141 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
                 throw new APIException("Failed to parse the response: " + _ex.Message, _context);
             }
         }
+
+        /// <summary>
+        /// Allows you to set a text alias on a given DID.
+        /// </summary>
+        /// <param name="number">Required parameter: Phone number to operate on.</param>
+        /// <param name="alias">Required parameter: Alias to apply.</param>
+        /// <return>Returns the response from the API call</return>
+        public Int32 SetDIDAlias(string number, string alias)
+        {
+            Task<Int32> t = SetDIDAliasAsync(number, alias);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Allows you to set a text alias on a given DID.
+        /// </summary>
+        /// <param name="number">Required parameter: Phone number to operate on.</param>
+        /// <param name="alias">Required parameter: Alias to apply.</param>
+        /// <return>Returns the response from the API call</return>
+        public async Task<Int32> SetDIDAliasAsync(string number, string alias)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/numbers/{did}");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "did", number }
+            });
+
+            var body = "{\"type\":\"number\", \"alias\":\"";
+            body += alias;
+            body += "\"}";
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "Flowroute SDK v3.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PatchBody(_queryUrl, _headers, body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            return _response.StatusCode;
+        }
+
+            /// <summary>
+        /// Allows you to set a text alias on a given DID.
+        /// </summary>
+        /// <param name="number">Required parameter: Phone number to operate on.</param>
+        /// <param name="callback">Required parameter: URL to apply.</param>
+        /// <return>Returns the response from the API call</return>
+        public Int32 SetDIDCallback(string number, string callback)
+        {
+            Task<Int32> t = SetDIDCallbackAsync(number, callback);
+            APIHelper.RunTaskSynchronously(t);
+            return t.Result;
+        }
+
+        /// <summary>
+        /// Allows you to set a text alias on a given DID.
+        /// </summary>
+        /// <param name="number">Required parameter: Phone number to operate on.</param>
+        /// <param name="callback">Required parameter: URL to apply.</param>
+        /// <return>Returns the response from the API call</return>
+        public async Task<Int32> SetDIDCallbackAsync(string number, string callback)
+        {
+            //the base uri for api requests
+            string _baseUri = Configuration.BaseUri;
+
+            //prepare query string for API call
+            StringBuilder _queryBuilder = new StringBuilder(_baseUri);
+            _queryBuilder.Append("/v2/numbers/{did}/relationships/dlr_callback");
+
+            //process optional template parameters
+            APIHelper.AppendUrlWithTemplateParameters(_queryBuilder, new Dictionary<string, object>()
+            {
+                { "did", number }
+            });
+
+            var body = "{\"data\":{\"attributes\": {\"callback_url\":\"";
+            body += callback;
+            body += "\"}}}";
+            //validate and preprocess url
+            string _queryUrl = APIHelper.CleanUrl(_queryBuilder);
+
+            //append request with appropriate headers and parameters
+            var _headers = new Dictionary<string, string>()
+            {
+                { "user-agent", "Flowroute SDK v3.0" },
+                { "accept", "application/json" }
+            };
+
+            //prepare the API call request to fetch the response
+            HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
+
+            //invoke request and get response
+            HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
+            HttpContext _context = new HttpContext(_request, _response);
+
+            //Error handling using HTTP status codes
+            if (_response.StatusCode == 401)
+                throw new ErrorException(@"Unauthorized – There was an issue with your API credentials.", _context);
+
+            if (_response.StatusCode == 404)
+                throw new ErrorException(@"The specified resource was not found", _context);
+
+            //handle errors defined at the API level
+            base.ValidateResponse(_response, _context);
+
+            return _response.StatusCode;
+        }
+
+
     }
 } 
