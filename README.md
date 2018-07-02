@@ -1,5 +1,4 @@
-The Flowroute .NET Library v3 provides methods for interacting with [Numbers v2](https://developer.flowroute.com/api/numbers/v2.0/) and [Messages v2.1](https://developer.flowroute.com/api/messages/v2.1/) of
-the [Flowroute](https://www.flowroute.com) API.
+The Flowroute .NET Library v3 provides methods for interacting with [Numbers v2](https://developer.flowroute.com/api/numbers/v2.0/) &endash; which includes inbound voice routes, E911 addresses, and CNAM storage &endash; and [Messages v2.1](https://developer.flowroute.com/api/messages/v2.1/) of the [Flowroute](https://www.flowroute.com) API.
 
 **Topics**
 
@@ -948,6 +947,98 @@ On success, the HTTP status code in the response header is `200 OK` and the resp
       }
     }
 
+
+### E911 Address Management
+
+Flowroute .NET Library v3 allows you to make HTTP requests to the `e911s` resource of Flowroute API v2:
+`https://api.flowroute.com/v2/e911s`
+
+#### GetE911Records(FlowrouteNumbersAndMessagingClient client) 
+
+The method declares `limit` and `offset` as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-e911-addresses/).
+
+##### Method Declaration
+```
+public static dynamic GetE911Records(FlowrouteNumbersAndMessagingClient client)
+        {
+            ArrayList return_list = new ArrayList();
+
+            // List all E911 records in our account paging through them 1 at a time
+            //  If you have several phone numbers, change the 'limit' variable below
+            //  This example is intended to show how to page through a list of resources
+
+            int? limit = 100;
+            int? offset = 0;
+
+            E911Controller e911s = client.E911s;
+            do
+            {
+                dynamic e911_data = e911s.ListE911s(limit, offset);
+
+                // Iterate through each number item
+                foreach (var item in e911_data.data)
+                {
+                    Console.WriteLine("---------------------------\nE911 Record:\n");
+                    Console.WriteLine("Attributes:{0}\nId:{1}\nLinks:{2}\nType:{3}\n", item.attributes, item.id, item.links, item.type);
+                    return_list.Add((string)item.id);
+                }
+
+                // See if there is more data to process
+                var links = e911_data.links;
+                if (links.next != null)
+                {
+                    // more data to pull
+                    offset += limit;
+                }
+                else
+                {
+                    break;   // no more data
+                }
+            }
+            while (true);
+
+            Console.WriteLine("Processing Complete");
+            return return_list;
+        }
+```
+
+##### Example Response
+
+On success, the HTTP status code in the response header is <span class="code-variable">200 OK</span> and the response body contains an array of e911 objects in JSON format. Note that this demo function iterates through all the E911 records on your account filtered by the parameters that you specify. The following example response has been clipped for brevity's sake.
+
+```
+E911 Record:
+{'data': [{'attributes': {'address_type': 'Lobby',
+                          'address_type_number': '12',
+                          'city': 'Seattle',
+                          'country': 'USA',
+                          'first_name': 'Maria',
+                          'label': 'Example E911',
+                          'last_name': 'Bermudez',
+                          'state': 'WA',
+                          'street_name': '20th Ave SW',
+                          'street_number': '7742',
+                          'zip': '98106'},
+           'id': '20930',
+           'links': {'self': 'https://api.flowroute.com/v2/e911s/20930'},
+           'type': 'e911'},
+          {'attributes': {'address_type': 'Apartment',
+                          'address_type_number': '12',
+                          'city': 'Seattle',
+                          'country': 'US',
+                          'first_name': 'Something',
+                          'label': '5th E911',
+                          'last_name': 'Someone',
+                          'state': 'WA',
+                          'street_name': 'Main St',
+                          'street_number': '645',
+                          'zip': '98104'},
+           'id': '20707',
+           'links': {'self': 'https://api.flowroute.com/v2/e911s/20707'},
+           'type': 'e911'}],
+ 'links': {'next': 'https://api.flowroute.com/v2/e911s?limit=10&offset=10',
+           'self': 'https://api.flowroute.com/v2/e911s?limit=10&offset=0'}}
+```
 
 Errors 
 ------
