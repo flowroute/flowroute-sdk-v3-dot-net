@@ -1002,6 +1002,12 @@ public static dynamic GetE911Records(FlowrouteNumbersAndMessagingClient client)
         }
 ```
 
+##### Example Request
+
+The following line in *Program.cs* calls the `GetE911Records` method:
+`ArrayList our_e911s = GetE911Records(client);`
+
+
 ##### Example Response
 
 On success, the HTTP status code in the response header is <span class="code-variable">200 OK</span> and the response body contains an array of e911 objects in JSON format. Note that this demo function iterates through all the E911 records on your account filtered by the parameters that you specify. The following example response has been clipped for brevity's sake.
@@ -1038,6 +1044,121 @@ E911 Record:
            'type': 'e911'}],
  'links': {'next': 'https://api.flowroute.com/v2/e911s?limit=10&offset=10',
            'self': 'https://api.flowroute.com/v2/e911s?limit=10&offset=0'}}
+```
+
+#### ListE911Details(FlowrouteNumbersAndMessagingClient client, string id)
+
+The method requires a string parameter, `id`, as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-e911-addresses/). The value that gets assigned to `id` is the first resulting item of the returned array, `our_e911s` from the `GetE911Records` method call.
+
+##### Method Declaration
+```
+public static dynamic ListE911Details(FlowrouteNumbersAndMessagingClient client, string id)
+        {
+            // Use the E911 Controller from our Client
+            E911Controller e911s = client.E911s;
+
+            Console.WriteLine("---------------------------\nList E911 Details:\n");
+            dynamic result = e911s.E911Details(id);
+            Console.WriteLine(result);
+            return result;
+        }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `ListE911Details` method:
+`ListE911Details(client, (string)our_e911s[0]);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains a detailed e911 object in JSON format. 
+
+```
+List E911 Details:
+{
+  "data": {
+    "attributes": {
+      "address_type": "Suite",
+      "address_type_number": "333",
+      "city": "Seattle",
+      "country": "US",
+      "first_name": "Albus",
+      "label": "Office Space III",
+      "last_name": "Rasputin, Jr.",
+      "state": "WA",
+      "street_name": "Main St",
+      "street_number": "666",
+      "zip": "98101"
+    },
+    "id": "21845",
+    "links": {
+      "self": "https://api.flowroute.com/v2/e911s/21845"
+    },
+    "type": "e911"
+  }
+}
+```
+#### ValidateE911(FlowrouteNumbersAndMessagingClient client)
+
+In the following example request, we instantiate `body` as an `E911` object, then initialize its different attributes with example values. The different attributes that an `E911Record` object can have include `Label`, `FirstName`, `LastName`, `StreetName`, `StreetNumber`, `AddressType`, `AddressTypeNumber`, `City`, `State`, `Country`, and `Zip`. Learn more about the different body parameters in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/validate-e911-address/). We then pass `body` as an argument for the `ValidateE911` method.
+
+##### Method Declaration
+```
+public static dynamic ValidateE911(FlowrouteNumbersAndMessagingClient client)
+        {
+            E911Controller e911s = client.E911s;
+            E911 body = new E911();
+            body.StreetName = "N Vassault";
+            body.StreetNumber = "3901";
+            body.AddressType = null;
+            body.AddressTypeNumber = null;
+            body.City = "Tacoma";
+            body.State = "WA";
+            body.Country = "US";
+            body.FirstName = "John";
+            body.LastName = "Doe";
+            body.Label = "Home";
+            body.Zip = "98407";
+
+            dynamic result = e911s.ValidateE911(body);
+            Console.WriteLine(result);
+            return result;
+        }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `ValidateE911` method:
+`ValidateE911(client);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content. On error, a printable representation of the detailed API response is displayed.
+
+```
+List E911 Details:
+{
+  "data": {
+    "attributes": {
+      "address_type": "Suite",
+      "address_type_number": "333",
+      "city": "Seattle",
+      "country": "US",
+      "first_name": "Albus",
+      "label": "Office Space III",
+      "last_name": "Rasputin, Jr.",
+      "state": "WA",
+      "street_name": "Main St",
+      "street_number": "666",
+      "zip": "98101"
+    },
+    "id": "21845",
+    "links": {
+      "self": "https://api.flowroute.com/v2/e911s/21845"
+    },
+    "type": "e911"
+  }
+}
 ```
 
 Errors 
