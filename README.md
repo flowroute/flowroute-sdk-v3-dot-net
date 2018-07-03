@@ -950,7 +950,7 @@ On success, the HTTP status code in the response header is `200 OK` and the resp
 
 ### E911 Address Management
 
-Flowroute .NET Library v3 allows you to make HTTP requests to the `e911s` resource of Flowroute API v2:
+The Flowroute .NET Library v3 allows you to make HTTP requests to the `e911s` resource of Flowroute API v2:
 `https://api.flowroute.com/v2/e911s`
 
 #### GetE911Records(FlowrouteNumbersAndMessagingClient client) 
@@ -1042,13 +1042,13 @@ E911 Record:
            'id': '20707',
            'links': {'self': 'https://api.flowroute.com/v2/e911s/20707'},
            'type': 'e911'}],
- 'links': {'next': 'https://api.flowroute.com/v2/e911s?limit=10&offset=10',
-           'self': 'https://api.flowroute.com/v2/e911s?limit=10&offset=0'}}
+ 'links': {'next': 'https://api.flowroute.com/v2/e911s?limit=100&offset=100',
+           'self': 'https://api.flowroute.com/v2/e911s?limit=100&offset=0'}}
 ```
 
 #### ListE911Details(FlowrouteNumbersAndMessagingClient client, string id)
 
-The method requires a string parameter, `id`, as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-e911-addresses/). The value that gets assigned to `id` is the first resulting item of the returned array, `our_e911s` from the `GetE911Records` method call.
+The method requires a string parameter, `id`, as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-e911-addresses/). The value that gets assigned to `id` is the first record of the resulting array, `our_e911s` from the `GetE911Records` method call.
 
 ##### Method Declaration
 ```
@@ -1135,8 +1135,129 @@ The following line in *Program.cs* calls the `ValidateE911` method:
 
 On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content. On error, a printable representation of the detailed API response is displayed.
 
+`204 No Content`
+
+#### CreateE911Address (FlowrouteNumbersAndMessagingClient client)
+
+In the following example request, we instantiate `body` as an `E911` object, then initialize its different attributes with example values. The different attributes that an `E911Record` object can have include `Label`, `FirstName`, `LastName`, `StreetName`, `StreetNumber`, `AddressType`, `AddressTypeNumber`, `City`, `State`, `Country`, and `Zip`. Learn more about the different body parameters in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/validate-e911-address/). We then pass `body` as an argument for the `CreateE911Address` method.
+
+##### Method Declaration
 ```
-List E911 Details:
+public static dynamic CreateE911Address(FlowrouteNumbersAndMessagingClient client)
+        {
+            E911Controller e911s = client.E911s;
+            E911 body = new E911();
+            body.StreetName = "3rd Ave";
+            body.StreetNumber = "1111";
+            body.AddressType = "Suite";
+            body.AddressTypeNumber = "200";
+            body.City = "Seattle";
+            body.State = "WA";
+            body.Country = "US";
+            body.FirstName = "John";
+            body.LastName = "Doe";
+            body.Label = "Potbelly";
+            body.Zip = "98101";
+
+            try
+            {
+                dynamic result = e911s.CreateE911Address(body);
+                Console.WriteLine(result);
+                return result;
+            } catch(FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e) {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `CreateE911Address` method:
+`CreateE911Address(client);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `201 Created` and the response body contains the newly created e911 object in JSON format. On error, a printable representation of the detailed API response is displayed.
+
+```
+--Create an E911 Address
+{
+  "data": {
+    "attributes": {
+      "address_type": "Suite",
+      "address_type_number": "200",
+      "city": "Seattle",
+      "country": "US",
+      "first_name": "John",
+      "label": "Potbelly",
+      "last_name": "Doe",
+      "state": "WA",
+      "street_name": "3rd Ave",
+      "street_number": "1111",
+      "zip": "98101"
+    },
+    "id": "21907",
+    "links": {
+      "self": "https://api.flowroute.com/v2/e911s/21907"
+    },
+    "type": "e911"
+  }
+}
+```
+
+#### UpdateE911Address(FlowrouteNumbersAndMessagingClient client, string e911_id, string new_label)
+
+The method accepts an E911 record ID and an E911 address label as parameters. Learn more about the different E911 attributes that you can update in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/update-and-validate-existing-e911-address/). In the following example, we will update the `label` of the first record of the resulting array, `our_e911s`, to "New Address".
+    
+##### Method Declaration
+```
+public static dynamic UpdateE911Address(FlowrouteNumbersAndMessagingClient client, string e911_id, string new_label)
+        {
+            E911Controller e911s = client.E911s;
+            dynamic result = e911s.E911Details(e911_id);
+
+            string jsonstring = result.ToString();
+            Newtonsoft.Json.Linq.JObject j = Newtonsoft.Json.Linq.JObject.Parse(jsonstring);
+            string old_label = (string)j["data"]["attributes"]["label"];
+            E911 body = new E911();
+            body.AddressType = (string)j["data"]["attributes"]["address_type"];
+            body.AddressTypeNumber = (string)j["data"]["attributes"]["address_type_number"];
+            body.AdressNumber = (string)j["data"]["attributes"]["street_number"];
+            body.City = (string)j["data"]["attributes"]["city"];
+            body.Country = (string)j["data"]["attributes"]["country"];
+            body.FirstName = (string)j["data"]["attributes"]["first_name"];
+            body.Id = (string)j["data"]["id"];
+            body.LastName = (string)j["data"]["attributes"]["last_name"];
+            body.State = (string)j["data"]["attributes"]["state"];
+            body.StreetName = (string)j["data"]["attributes"]["street_name"];
+            body.StreetNumber = (string)j["data"]["attributes"]["street_number"];
+            body.Zip = (string)j["data"]["attributes"]["zip"];
+            body.Label = (string)new_label;
+
+            try
+            {
+                dynamic submissin_result = e911s.UpdateE911Address(body);
+                Console.WriteLine(result);
+                return result;
+            }
+            catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+        }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `UpdateE911Address` method:
+`UpdateE911Address(client, (string)our_e911s[0], "New Address");`
+
+##### Example Response
+On success, the HTTP status code in the response header is `200 OK` and the response body contains the newly updated e911 object in JSON format. On error, a printable representation of the detailed API response is displayed.
+
+```
 {
   "data": {
     "attributes": {
@@ -1145,7 +1266,7 @@ List E911 Details:
       "city": "Seattle",
       "country": "US",
       "first_name": "Albus",
-      "label": "Office Space III",
+      "label": "New Address",
       "last_name": "Rasputin, Jr.",
       "state": "WA",
       "street_name": "Main St",
@@ -1160,6 +1281,158 @@ List E911 Details:
   }
 }
 ```
+
+#### AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)G
+
+The method accepts a long code or toll-free phone number ID and an E911 record ID on your Flowroute account as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-valid-e911-address-to-phone-number/). In the following example, we call the [GetNumbers](#getnumbersflowroutenumbersandmessagingclient-client) function covered under Number Management to extract and pass the value of the first item in the returned JSON array, `our_numbers`,  pass the first item from  `our_e911s` as the E911 record ID, and then make the association between them.
+    
+##### Method Declaration
+```
+public static dynamic AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)
+    {
+        E911Controller e911s = client.E911s;
+        try
+        {
+            dynamic result = e911s.AssociateE911(number_id, e911_id);
+            Console.WriteLine(result);
+            return result;
+        } catch(FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e) {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `AssociateE911` method:
+
+`AssociateE911(client, (string)our_numbers[0], (string)our_e911s[0]);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+`204 No Content`
+
+#### UnassociateE911(FlowrouteNumbersAndMessagingClient client, string number_id)
+
+The method accepts a phone number as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/deactivate-e911-service-for-phone-number/). In the following example, we deactivate the E911 service for our previously assigned `number_id`.
+    
+##### Method Declaration
+```
+public static dynamic UnassociateE911(FlowrouteNumbersAndMessagingClient client, string number_id)
+    {
+        E911Controller e911s = client.E911s;
+        try
+        {
+            dynamic result = e911s.UnassociateE911(number_id);
+            Console.WriteLine(result);
+            return result;
+        }
+        catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+```
+
+##### Example Request
+
+The following line in *Program.cs* calls the `UnassociateE911` method:
+
+`UnassociateE911(client, (string)our_numbers[0]);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+`204 No Content`
+
+
+#### ListE911Associations(FlowrouteNumbersAndMessagingClient client, string e911_id)
+
+The method accepts an E911 record id as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-phone-numbers-associated-with-e911-record/). In the following example, we retrieve the list of phone numbers associated with the first item from `our_e911s`.
+
+##### Method Declaration
+```
+public static dynamic ListE911Associations(FlowrouteNumbersAndMessagingClient client, string e911_id)
+    {
+        E911Controller e911s = client.E911s;
+        try
+        {
+            dynamic result = e911s.ListDidsForE911(e911_id);
+            Console.WriteLine(result);
+            return result;
+        }
+        catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+```
+
+##### Example Request
+The following line in *Program.cs* calls the `ListE911Associations` method:
+`ListE911Associations(client, (string)our_e911s[0]);`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of related number objects in JSON format.
+```
+{
+  "data": [
+    {
+      "attributes": {
+        "alias": null,
+        "value": "12062011682"
+      },
+      "id": "12062011682",
+      "links": {
+        "self": "https://api.flowroute.com/v2/numbers/12062011682"
+      },
+      "type": "number"
+    }
+  ],
+  "links": {
+    "self": "https://api.flowroute.com/v2/e911s/21907/relationships/numbers?limit=10&offset=0"
+  }
+}
+```
+
+#### DeleteE911(FlowrouteNumbersAndMessagingClient client, string e911_id)
+
+The method accepts an E911 record ID as a parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/remove-e911-address-from-account/). Note that all phone number associations must be removed first before you are able to delete the specified `e911_id`. In the following example, we will attempt to delete the first item from `our_e911s`. 
+
+##### Method Declaration
+```
+ public static dynamic DeleteE911(FlowrouteNumbersAndMessagingClient client, string e911_id)
+    {
+        E911Controller e911s = client.E911s;
+        try
+        {
+            dynamic result = e911s.DeleteE911(e911_id);
+            Console.WriteLine(result);
+            return result;
+        }
+        catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+    }
+```
+
+##### Example Request
+The following line in *Program.cs* calls the `DeleteE911` method:
+`DeleteE911(client, (string)our_e911s[0]);`
+
+##### Example Response
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+`204 No Content`
 
 Errors 
 ------
