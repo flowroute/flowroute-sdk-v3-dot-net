@@ -1546,6 +1546,8 @@ The following line in **Program.cs** calls the `GetCNAMRecords` method:
 
 
 ##### Example Response
+On success, the HTTP status code in the response header is `200 OK` and the response body contains an array of approved **cnam** objects in JSON format.
+
 ```
 {'data': [{'attributes': {'approval_datetime': None,
                           'creation_datetime': None,
