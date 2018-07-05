@@ -1608,6 +1608,181 @@ The following line in **Program.cs** calls the `GetCNAMRecords` method:
  'links': {'self': 'https://api.flowroute.com/v2/cnams?limit=10&offset=0'}}
 ```
 
+#### GetCNAMDetail(FlowrouteNumbersAndMessagingClient client) 
+
+The method first invokes the CNAMsController then declares a dynamic variable, `cnam_data`, which calls the *GetCNAMDetails* function with the ID of the first record in the array, `our_cnams`, as an argument. *GetCNAMDetails* then retrieves the details of that specific CNAM record. The CNAM record ID is a path parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-cnam-record-details/).
+
+##### Method Declaration
+```
+public static dynamic GetCNAMDetail(FlowrouteNumbersAndMessagingClient client, string cnam_id)
+{
+	CNAMsController cnams = client.CNAMs;
+	dynamic cnam_data = cnams.GetCNAMDetails(cnam_id);
+	Console.WriteLine(cnam_data);
+	return cnam_data;
+}
+```
+
+##### Example Request
+
+The following line in **Program.cs** calls the `GetCNAMDetail` method after initializing `our_cnams`:
+```
+ArrayList our_cnams = GetCNAMRecords(client);
+GetCNAMDetail(client, (string)our_cnams[0]);
+```
+
+##### Example Response
+On success, the HTTP status code in the response header is `200 OK` and the response body contains a detailed cnam object in JSON format.
+
+```
+{'data': {'attributes': {'approval_datetime': None,
+                         'creation_datetime': None,
+                         'is_approved': True,
+                         'rejection_reason': '',
+                         'value': 'TEST, MARIA'},
+          'id': '17604',
+          'links': {'self': 'https://api.flowroute.com/v2/cnams/17604'},
+          'type': 'cnam'}}
+```
+
+
+#### CreateCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_value) 
+
+The method first invokes the CNAMsController then declares a dynamic variable, `cnam_data`, which calls the *CreateCNAM* function and passes a Caller ID value as an argument. The Caller ID value, or `cnam_value`, is a body parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/create-a-new-cnam-record/). In the following example, we pass "Flowroute" as our example CNAM value. Note that you can enter up to 15 characters for your CNAM value.
+
+##### Method Declaration
+```
+public static dynamic CreateCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_value)
+{
+	CNAMsController cnams = client.CNAMs;
+	dynamic cnam_data = cnams.CreateCNAM(cnam_value);
+	Console.WriteLine(cnam_data);
+	return cnam_data;
+}
+```
+
+##### Example Request
+
+The following line in **Program.cs** calls the `CreateCNAM` method:
+`CreateCNAM(client, "Flowroute");`
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `201 Created` and the response body contains the newly created cnam object in JSON format. 
+
+```
+{
+  "data": {
+    "attributes": {
+      "approval_datetime": null,
+      "creation_datetime": "2018-06-27 20:44:01.543801+00:00",
+      "is_approved": false,
+      "rejection_reason": null,
+      "value": "FLOWROUTE"
+    },   
+    "id": "23922",
+    "links": {
+      "self": "https://api.flowroute.com/v2/cnams/23922"
+    },   
+    "type": "cnam"
+  }
+}
+```
+
+#### AssociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id, string cnam_id) 
+
+The method first invokes the CNAMsController then declares a dynamic variable, `return_data`, which calls the *AssociateCNAM* function and passes a phone number ID and a CNAM record ID as arguments.  Both the phone number and CNAM IDs are path parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-cnam-record-to-phone-number/). In the following example, we will associate the first number returned in `our_numbers` with the first CNAM record returned in `our_cnams`.
+
+##### Method Declaration
+```
+public static dynamic AssociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id, string cnam_id)
+{
+	CNAMsController cnams = client.CNAMs;
+	dynamic return_data = cnams.AssociateCNAM(number_id, cnam_id);
+	Console.WriteLine(return_data);
+	return return_data;
+}
+```
+
+##### Example Request
+
+The last line in **Program.cs** below calls the `AssociateCNAM` method after initializing `our_numbers` and `our_cnams`:
+```
+ArrayList our_numbers = GetNumbers(client);
+ArrayList our_cnams = GetCNAMRecords(client);
+AssociateCNAM(client, (string)our_numbers[0], (string)our_cnams[0]);
+```
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `202 Accepted` and the response body contains an attributes dictionary containing the `date_created` field and the assigned cnam object in JSON format. This request will fail if the CNAM you are trying to associate has not yet been approved.
+```
+{'data': {'attributes': {'date_created': 'Fri, 01 Jun 2018 00:17:52 GMT'},
+          'id': 22790,
+          'type': 'cnam'}}
+```
+
+#### UnassociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id) 
+
+The method first invokes the CNAMsController then declares a dynamic variable, `return_data`, which calls the *UnassociateCNAM* function and passes a phone number ID as an argument.  The phone number ID is a path parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-cnam-record-to-phone-number/). In the following example, we will disassociate the same phone number that we've used in *AssociateCNAM*.
+
+##### Method Declaration
+```
+public static dynamic UnassociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id)
+{
+	CNAMsController cnams = client.CNAMs;
+	dynamic return_data = cnams.UnassociateCNAM(number_id);
+	Console.WriteLine(return_data);
+	return return_data;
+}
+```
+
+##### Example Request
+
+The last line in **Program.cs** below calls the `AssociateCNAM` method after initializing `our_numbers`:
+```
+ArrayList our_numbers = GetNumbers(client);
+UnassociateCNAM(client, (string)our_numbers[0]);
+```
+
+##### Example Response
+On success, the HTTP status code in the response header is `202 Accepted` and the response body contains an attributes object with the date the CNAM was requested to be disassociated, and the updated cnam object in JSON format. 
+
+```
+{'data': {'attributes': {'date_created': 'Wed, 27 Jun 2018 20:59:36 GMT'},
+          'id': None,
+          'type': 'cnam'}}
+```
+
+#### DeleteCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_id) 
+
+The method first invokes the CNAMsController then declares a dynamic variable, `return_data`, which calls the *DeleteCNAM* function and passes a CNAM record ID as an argument.  The CNAM record ID is a path parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-cnam-record-to-phone-number/). In the following example, we will delete the CNAM record that we've used in *AssociateCNAM*.
+
+##### Method Declaration
+```
+public static dynamic DeleteCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_id)
+{
+	CNAMsController cnams = client.CNAMs;
+	dynamic return_data = cnams.DeleteCNAM(cnam_id);
+	Console.WriteLine(return_data);
+	return return_data;
+}
+```
+
+##### Example Request
+
+The last line in **Program.cs** below calls the `AssociateCNAM` method after initializing `our_cnams`:
+```
+ArrayList our_cnams = GetCNAMRecords(client);
+DeleteCNAM(client, (string)our_cnams[0]);
+```
+
+##### Example Response
+
+On success, the HTTP status code in the response header is `204 No Content` which means that the server successfully processed the request and is not returning any content.
+
+`204 No Content`
+
 Errors 
 ------
 
