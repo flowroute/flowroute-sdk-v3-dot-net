@@ -1490,6 +1490,11 @@ On success, the HTTP status code in the response header is `204 No Content` whic
 
 `204 No Content`
 
+### CNAM Record Management
+
+The Flowroute .NET Library v3 allows you to make HTTP requests to the `cnams` resource of Flowroute API v2:
+`https://api.flowroute.com/v2/cnams`
+
 #### GetCNAMRecords(FlowrouteNumbersAndMessagingClient client) 
 
 The method declares variables `limit` and `offset` which are query parameters that you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/list-account-cnam-records/). Afterwards, the method invokes the CNAMsController then iterates through each of the approved CNAM record on your account.
