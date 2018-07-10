@@ -20,7 +20,7 @@ namespace testSDK
                                                                                                FlowrouteNumbersAndMessaging.Standard.Configuration.BasicAuthPassword);
             // List all our numbers
             ArrayList our_numbers = GetNumbers(client);
-
+            /*
             // Find details for a specific number
             dynamic number_details = GetNumberDetails(client, (string)our_numbers[0]);
 
@@ -28,12 +28,12 @@ namespace testSDK
             ArrayList available_numbers = GetAvailableNumbers(client);
 
             // Purchase a DID
-            Number26 did_detail = PurchaseDid(client, (string)available_numbers[0]);
+            //Number26 did_detail = PurchaseDid(client, (string)available_numbers[0]);
 
             // Release a DID
-            if(did_detail != null) {
-                ReleaseDid(client, did_detail.Data.Id);
-            }
+            //if(did_detail != null) {
+            //    ReleaseDid(client, did_detail.Data.Id);
+            //}
 
             // List Available Area Codes
             ArrayList available_areacodes = GetAvailableAreaCodes(client);
@@ -88,7 +88,9 @@ namespace testSDK
             CreateE911Address(client);
 
             // Update an E911 Address
-            UpdateE911Address(client, (string)our_e911s[0], "New Address");
+            Random random = new Random();
+            string new_label = String.Format("New Address {0}", random.Next(0, 100));
+            UpdateE911Address(client, (string)our_e911s[0], new_label);
 
             // Associate an E911 Address with a DID
             AssociateE911(client, (string)our_numbers[0], (string)our_e911s[0]);
@@ -103,11 +105,10 @@ namespace testSDK
             DeleteE911(client, (string)our_e911s[0]);
 
             //----------------- Messaging --------------------------
-
             // List all our SMS Messages
             ArrayList our_messages = GetMessages(client);
 
-            string target_number = "YOUR MOBILE NUMBER HERE";
+            string target_number = "4254664078";
 
             // Send an SMS Message from our account
             SendSMS(client, (string)our_numbers[0], target_number);
@@ -149,7 +150,7 @@ namespace testSDK
 
             // Delete a CNAM record
             DeleteCNAM(client, (string)our_cnams[0]);
-
+            */
             //----------------- Portability -----------------------
 
             // Check number portability
@@ -838,33 +839,62 @@ namespace testSDK
         public static dynamic CreateCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_value)
         {
             CNAMsController cnams = client.CNAMs;
-            dynamic cnam_data = cnams.CreateCNAM(cnam_value);
-            Console.WriteLine(cnam_data);
-            return cnam_data;
+            try
+            {
+                dynamic cnam_data = cnams.CreateCNAM(cnam_value);
+                Console.WriteLine(cnam_data);
+                return cnam_data;
+            }
+            catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static dynamic AssociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id, string cnam_id)
         {
             CNAMsController cnams = client.CNAMs;
-            dynamic return_data = cnams.AssociateCNAM(number_id, cnam_id);
-            Console.WriteLine(return_data);
-            return return_data;
+            try
+            {
+                dynamic return_data = cnams.AssociateCNAM(number_id, cnam_id);
+                Console.WriteLine(return_data);
+                return return_data;
+            } catch(FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e) {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static dynamic UnassociateCNAM(FlowrouteNumbersAndMessagingClient client, string number_id)
         {
             CNAMsController cnams = client.CNAMs;
-            dynamic return_data = cnams.UnassociateCNAM(number_id);
-            Console.WriteLine(return_data);
-            return return_data;
+            try
+            {
+                dynamic return_data = cnams.UnassociateCNAM(number_id);
+                Console.WriteLine(return_data);
+                return return_data;
+            }
+            catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static dynamic DeleteCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_id)
         {
             CNAMsController cnams = client.CNAMs;
-            dynamic return_data = cnams.DeleteCNAM(cnam_id);
-            Console.WriteLine(return_data);
-            return return_data;
+            try {
+                dynamic return_data = cnams.DeleteCNAM(cnam_id);
+                Console.WriteLine(return_data);
+                return return_data;
+            }
+            catch (FlowrouteNumbersAndMessaging.Standard.Exceptions.ErrorException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static dynamic CheckPortability(FlowrouteNumbersAndMessagingClient client, List<string>numbers_to_check)

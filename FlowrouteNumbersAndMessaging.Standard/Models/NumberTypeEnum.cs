@@ -16,6 +16,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
         STANDARD, //TODO: Write general description for this method
         TOLLFREE, //TODO: Write general description for this method
         INUM, //TODO: Write general description for this method
+        LONGCODE,
     }
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
     public static class NumberTypeEnumHelper
     {
         //string values corresponding the enum elements
-        private static List<string> stringValues = new List<string> { "standard", "tollfree", "inum" };
+        private static List<string> stringValues = new List<string> { "standard", "tollfree", "inum", "longcode" };
 
         /// <summary>
         /// Converts a NumberTypeEnum value to a corresponding string value
@@ -40,6 +41,7 @@ namespace FlowrouteNumbersAndMessaging.Standard.Models
                 case NumberTypeEnum.STANDARD:
                 case NumberTypeEnum.TOLLFREE:
                 case NumberTypeEnum.INUM:
+                case NumberTypeEnum.LONGCODE:    
                     return stringValues[(int)enumValue];
 
                 //an invalid enum value was requested

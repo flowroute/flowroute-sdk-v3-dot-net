@@ -10,6 +10,9 @@ using FlowrouteNumbersAndMessaging.Standard.Http.Request;
 using FlowrouteNumbersAndMessaging.Standard.Http.Response;
 using FlowrouteNumbersAndMessaging.Standard.Http.Client;
 using FlowrouteNumbersAndMessaging.Standard.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 {
@@ -164,9 +167,15 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
                 { "content-type", "application/vnd.api+json" }
             };
 
-            //append body params
             var _body = APIHelper.JsonSerialize(body);
-            Console.WriteLine("Body is : {0} ", _body);
+            //append body params
+            if (body.Callback == null)
+            {
+                var raw = APIHelper.JsonSerialize(body);
+                var o = (Newtonsoft.Json.Linq.JObject)JsonConvert.DeserializeObject(raw);
+                o.Property("dlr_callback").Remove();
+                _body = JsonConvert.SerializeObject(o);
+            }
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
@@ -240,6 +249,14 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
 
             //append body params
             var _body = APIHelper.JsonSerialize(body);
+            //append body params
+            if (body.Callback == null)
+            {
+                var raw = APIHelper.JsonSerialize(body);
+                var o = (Newtonsoft.Json.Linq.JObject)JsonConvert.DeserializeObject(raw);
+                o.Property("dlr_callback").Remove();
+                _body = JsonConvert.SerializeObject(o);
+            }
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);

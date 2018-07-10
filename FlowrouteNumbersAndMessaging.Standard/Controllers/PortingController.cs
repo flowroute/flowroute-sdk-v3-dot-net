@@ -81,11 +81,12 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             var _headers = new Dictionary<string, string>()
             {
                 { "user-agent", "Flowroute SDK v3.0" },
-                { "accept", "application/json" }
+                { "accept", "application/vnd.api+json" }
             };
 
             //append body params
             var _body = APIHelper.JsonSerialize(body);
+            Console.WriteLine("Passing body " + _body);
 
             //prepare the API call request to fetch the response
             HttpRequest _request = ClientInstance.PostBody(_queryUrl, _headers, _body, Configuration.BasicAuthUserName, Configuration.BasicAuthPassword);
@@ -93,6 +94,8 @@ namespace FlowrouteNumbersAndMessaging.Standard.Controllers
             //invoke request and get response
             HttpStringResponse _response = (HttpStringResponse)await ClientInstance.ExecuteAsStringAsync(_request).ConfigureAwait(false);
             HttpContext _context = new HttpContext(_request, _response);
+
+            Console.WriteLine("Resp: {0}, {1}", _response.StatusCode, _response.Body);
 
             //Error handling using HTTP status codes
             if (_response.StatusCode == 401)
