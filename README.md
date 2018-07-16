@@ -1295,7 +1295,8 @@ public static dynamic UpdateE911Address(FlowrouteNumbersAndMessagingClient clien
 
 ##### Example Request
 
-The following line in **Program.cs** calls the `UpdateE911Address` method after initializing `our_e911s`:
+ArrayList our_e911s = GetE911Records(client);
+UpdateE911Address(client, (string)our_e911s[0], "New Address");The following line in **Program.cs** calls the `UpdateE911Address` method after initializing `our_e911s`:
 ```
 ArrayList our_e911s = GetE911Records(client);
 UpdateE911Address(client, (string)our_e911s[0], "New Address");
@@ -1329,8 +1330,7 @@ On success, the HTTP status code in the response header is `200 OK` and the resp
 }
 ```
 
-#### AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)G
-
+#### AssociateE911(FlowrouteNumbersAndMessagingClient client, string number_id, string e911_id)
 The method accepts a long code or toll-free phone number ID and an E911 record ID on your Flowroute account as parameters which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-valid-e911-address-to-phone-number/). In the following example, we call the [GetNumbers](#getnumbersflowroutenumbersandmessagingclient-client) function covered under Number Management to extract and pass the value of the first item in the returned JSON array, `our_numbers`,  pass the first item from  `our_e911s` as the E911 record ID, and then make the association between them.
     
 ##### Method Declaration
@@ -1657,6 +1657,16 @@ On success, the HTTP status code in the response header is `200 OK` and the resp
 
 The method first invokes the CNAMsController then declares a dynamic variable, `cnam_data`, which calls the *CreateCNAM* function and passes a Caller ID value as an argument. The Caller ID value, or `cnam_value`, is a body parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/create-a-new-cnam-record/). In the following example, we pass "Flowroute" as our example CNAM value. Note that you can enter up to 15 characters for your CNAM value.
 
+| CNAM Storage Rules |
+| ------------------- |
+| You can enter up to 15 characters for your CNAM value at least one of which is a letter. |
+| While most CNAM presets can be approved, the following are not allowed and must be rejected: |
+|    -  Consist of curse words and/or is inappropriate. |
+|    -  A phone number (CNAM must be a name not a number) |
+|    -  If the CNAM preset which the customer has submitted appears to be misleading such as: |
+|       - Political Figures or Places (Obama, Barack or The White House) |
+|       - False or fake CNAM (Seattle Police) |
+
 ##### Method Declaration
 ```
 public static dynamic CreateCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_value)
@@ -1675,7 +1685,7 @@ The following line in **Program.cs** calls the `CreateCNAM` method:
 
 ##### Example Response
 
-On success, the HTTP status code in the response header is `201 Created` and the response body contains the newly created cnam object in JSON format. 
+On success, the HTTP status code in the response header is `201 Created` and the response body contains the newly created cnam object in JSON format. Note that CNAM records take up to 48 hours to be approved on your account and further association with a phone number takes 5-7 business days
 
 ```
 {
@@ -1746,7 +1756,7 @@ public static dynamic UnassociateCNAM(FlowrouteNumbersAndMessagingClient client,
 
 ##### Example Request
 
-The last line in **Program.cs** below calls the `AssociateCNAM` method after initializing `our_numbers`:
+The last line in **Program.cs** below calls the `UnassociateCNAM` method after initializing `our_numbers`:
 ```
 ArrayList our_numbers = GetNumbers(client);
 UnassociateCNAM(client, (string)our_numbers[0]);
@@ -1763,7 +1773,7 @@ On success, the HTTP status code in the response header is `202 Accepted` and th
 
 #### DeleteCNAM(FlowrouteNumbersAndMessagingClient client, string cnam_id) 
 
-The method first invokes the CNAMsController then declares a dynamic variable, `return_data`, which calls the *DeleteCNAM* function and passes a CNAM record ID as an argument.  The CNAM record ID is a path parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/assign-cnam-record-to-phone-number/). In the following example, we will delete the CNAM record that we've used in *AssociateCNAM*.
+The method first invokes the CNAMsController then declares a dynamic variable, `return_data`, which calls the *DeleteCNAM* function and passes a CNAM record ID as an argument.  The CNAM record ID is a path parameter which you can learn more about in the [API reference](https://developer.flowroute.com/api/numbers/v2.0/remove-cnam-record-from-account/). In the following example, we will delete the CNAM record that we've used in *AssociateCNAM*.
 
 ##### Method Declaration
 ```
@@ -1778,7 +1788,7 @@ public static dynamic DeleteCNAM(FlowrouteNumbersAndMessagingClient client, stri
 
 ##### Example Request
 
-The last line in **Program.cs** below calls the `AssociateCNAM` method after initializing `our_cnams`:
+The last line in **Program.cs** below calls the `DeleteCNAM` method after initializing `our_cnams`:
 ```
 ArrayList our_cnams = GetCNAMRecords(client);
 DeleteCNAM(client, (string)our_cnams[0]);
@@ -1798,3 +1808,4 @@ In cases of HTTP errors, the .NET library displays a pop-up window with an error
 ### Example Error 
 
 ![dot-net-error.png](https://github.com/flowroute/flowroute-sdk-v3-dot-net/blob/master/images/dot-net-error.png?raw=true)
+
